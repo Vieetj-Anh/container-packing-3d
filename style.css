@@ -1,0 +1,77 @@
+:root { 
+    --bg-main: #f0f2f5; 
+    --panel-bg: #ffffff; 
+    --text-dark: #333333; 
+    --text-gray: #666666;
+    --border: #cccccc; 
+    --primary: #0056b3;
+    --primary-hover: #004494;
+}
+
+* { box-sizing: border-box; }
+
+body { 
+    margin: 0; padding: 0; 
+    background-color: var(--bg-main); color: var(--text-dark); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.top-menu { background: #e0e0e0; display: flex; padding: 5px 15px; border-bottom: 1px solid var(--border); font-size: 13px;}
+.menu-item { padding: 5px 15px; cursor: pointer; color: #333; }
+.menu-item:hover { background: #d0d0d0; border-radius: 3px; }
+
+.header-title { text-align: center; padding: 10px 0; background: #fff; border-bottom: 2px solid #ddd;}
+.header-title h2 { margin: 0; font-size: 18px; color: #222; }
+.header-title p { margin: 5px 0 0 0; font-size: 13px; color: var(--text-gray); }
+
+.app-container { display: flex; flex: 1; overflow: hidden; }
+
+.left-panel { 
+    width: 380px; background: var(--panel-bg); border-right: 1px solid var(--border); 
+    padding: 15px; display: flex; flex-direction: column; 
+    overflow-y: auto; overflow-x: hidden; 
+}
+
+.panel-header { background: #444; color: #fff; padding: 6px 10px; font-weight: bold; border-radius: 4px; font-size: 13px; margin-bottom: 15px;}
+.section-title { font-weight: bold; font-size: 12px; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin: 15px 0 10px 0; color: #444; }
+
+.input-section { background: #f9f9f9; padding: 10px; border: 1px solid #e5e5e5; border-radius: 4px; font-size: 12px; width: 100%;}
+.input-section select { width: 100%; padding: 6px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 3px;}
+.info-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;}
+
+.carton-type { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; width: 100%;}
+.carton-type:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+
+.carton-header { margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center;}
+.flip-option { font-size: 11px; font-weight: normal; color: #555; cursor: pointer;}
+
+.carton-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+.carton-inputs > div { display: flex; flex-direction: column; }
+.carton-inputs label { font-size: 10px; color: #777; margin-bottom: 3px; }
+.carton-inputs input { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ccc; border-radius: 3px; text-align: right;}
+
+.options-section label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; cursor: pointer;}
+
+.btn-primary { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; transition: 0.2s;}
+.btn-primary:hover { background: var(--primary-hover); }
+.loading { display: none; color: #d32f2f; font-size: 12px; margin-top: 10px; text-align: center; font-weight: bold;}
+
+.center-panel { flex: 1; position: relative; background: #e8eaed; }
+#canvas-container { width: 100%; height: 100%; }
+
+.floating-toolbar { position: absolute; background: rgba(255,255,255,0.9); border: 1px solid #ccc; padding: 10px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.tb-title { font-size: 11px; font-weight: bold; color: #555; margin-bottom: 8px; }
+.icon-btn { background: #fff; border: 1px solid #ccc; padding: 6px; border-radius: 4px; cursor: pointer; margin-right: 5px;}
+.icon-btn:hover { background: #eee; }
+
+.floating-result { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.95); border: 1px solid #ccc; padding: 15px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 230px;}
+.res-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; color: #444;}
+.res-row b { color: #000; }
+.res-big { text-align: center; font-size: 12px; font-weight: bold; margin-top: 15px; color: #555;}
+
+.highlight-blue { display: block; font-size: 18px; color: var(--primary); margin-top: 5px; }
+.highlight-orange { display: block; font-size: 18px; color: #e65c00; margin-top: 5px; }
+
+.legend-item { display: flex; align-items: center; font-size: 11px; margin-bottom: 5px;}
+.box-color { display: inline-block; width: 14px; height: 14px; margin-right: 8px; border-radius: 2px;}

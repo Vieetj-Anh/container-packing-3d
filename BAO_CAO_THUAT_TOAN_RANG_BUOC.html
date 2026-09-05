@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Kỹ Thuật: Mô Hình Toán Học, Thuật Toán & Phân Tích Chi Tiết Tham Số (v3.3)</title>
+    <!-- Cấu hình MathJax chuẩn để render công thức toán học LaTeX chuẩn xác -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #004085;
+            --accent-color: #e65c00;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --code-bg: #212529;
+            --code-color: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 35px 15px;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 45px 55px;
+            border-radius: 10px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 14px;
+            font-size: 26px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 35px;
+            font-style: italic;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 45px;
+            font-size: 21px;
+        }
+
+        h3 {
+            color: #2b3035;
+            margin-top: 30px;
+            font-size: 18px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .formula-card {
+            background-color: #f1f7ff;
+            border-left: 5px solid var(--primary-color);
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .formula-title {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .code-container {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 14px 0;
+            line-height: 1.45;
+        }
+
+        .code-tag {
+            display: inline-block;
+            background: #444;
+            color: #fffae6;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-bottom: 6px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0 25px 0;
+            font-size: 13.5px;
+        }
+
+        table, th, td {
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #e9ecef;
+            color: #333;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 9px 12px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        .param-table th {
+            background-color: #e2eafc;
+            color: #003049;
+        }
+
+        .param-sym {
+            font-family: "Cambria Math", "Times New Roman", serif;
+            font-size: 15px;
+            font-weight: bold;
+            color: #0056b3;
+            white-space: nowrap;
+        }
+
+        .param-code {
+            font-family: "Consolas", monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #d63384;
+            font-size: 12.5px;
+        }
+
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+
+        .danger-box {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--danger-color);
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+
+        .toc {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 22px 28px;
+            margin-bottom: 35px;
+        }
+
+        .toc ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin: 6px 0;
+        }
+
+        .toc a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Báo Cáo Kỹ Thuật: Mô Hình Toán Học, Thuật Toán & Tham Số</h1>
+    <div class="subtitle">Đề án: Mô phỏng xếp Container 3D có lót Pallet sàn tự động (Mã nguồn v3.3 gốc)</div>
+
+    <div class="toc">
+        <h3 style="margin-top: 0; color: #333; border: none; padding: 0;">Mục lục tài liệu</h3>
+        <ul>
+            <li><a href="#sec1">1. Mối liên hệ cốt lõi giữa Mô hình Toán học (MILP) và Thuật toán trong Code</a></li>
+            <li><a href="#sec2">2. Hệ quy chiếu không gian 3D & Ký hiệu toán học tổng thể</a></li>
+            <li><a href="#sec3">3. Phân tích chi tiết 6 Ràng buộc kỹ thuật & Bóc tách tham số (Parameters)</a>
+                <ul>
+                    <li><a href="#sec3-1">3.1. Ràng buộc biên lòng Container (Boundary Constraints - Formula 3.2 đến 3.5)</a></li>
+                    <li><a href="#sec3-2">3.2. Ràng buộc chống va chạm không gian 3D (Non-Overlap - Formula 3.6 & Hệ tách trục)</a></li>
+                    <li><a href="#sec3-3">3.3. Ràng buộc diện tích tiếp xúc nâng đỡ trọng lực (Support Area &ge; 75%)</a></li>
+                    <li><a href="#sec3-4">3.4. Ràng buộc bảo vệ hàng dễ vỡ (Fragile Crush Protection)</a></li>
+                    <li><a href="#sec3-5">3.5. Ràng buộc phân bổ trọng tâm Container (Center of Gravity - CoG)</a></li>
+                    <li><a href="#sec3-6">3.6. Ràng buộc tải trọng tối đa & Kích hoạt Pallet động</a></li>
+                </ul>
+            </li>
+            <li><a href="#sec4">4. Thuật toán tối ưu bố trí mặt sàn Pallet (6 Kịch bản Heuristic)</a></li>
+            <li><a href="#sec5">5. Phân tích tham số các chỉ số KPI đánh giá hiệu quả (Formula 3.17 - 3.19)</a></li>
+            <li><a href="#sec6">6. Bảng đối chiếu tổng hợp (Toán học vs. Code)</a></li>
+        </ul>
+    </div>
+
+    <!-- PHẦN 1 -->
+    <h2 id="sec1">1. Mối liên hệ cốt lõi giữa Mô hình Toán học (MILP) và Thuật toán trong Code</h2>
+    <p>
+        Trong lý thuyết Vận trù học (Operations Research), bài toán đóng gói container 3D (<strong>3D Container Loading Problem - 3D-CLP</strong>) thuộc lớp bài toán <strong>NP-hard</strong>.
+    </p>
+    <ul>
+        <li><strong>Mô hình Quy hoạch tuyến tính nguyên hỗn hợp (MILP - Mixed Integer Linear Programming):</strong> Sử dụng kỹ thuật <em>Big-M</em> và các biến nhị phân \(u_i, a_{ij}, b_{ij}, \dots\) để định nghĩa bài toán trên lý thuyết toán học. Tuy nhiên, nếu dùng solver chính xác (CPLEX, Gurobi) để giải, máy tính sẽ bị quá tải hoặc mất hàng giờ khi số kiện hàng \(N > 30\).</li>
+        <li><strong>Giải pháp mã nguồn <code>v3.3 gốc</code>:</strong> Hiện thực hóa chính xác 100% các điều kiện ràng buộc toán học này thông qua giải thuật kiến tạo <strong>Heuristic Extreme Points (Điểm góc cực trị)</strong> kết hợp quy tắc <strong>First-Fit Decreasing (FFD)</strong>. Thời gian chạy chỉ mất vài mili-giây, hoàn toàn đáp ứng môi trường Web tương tác 3D theo thời gian thực.</li>
+    </ul>
+
+    <!-- PHẦN 2 -->
+    <h2 id="sec2">2. Hệ quy chiếu không gian 3D & Ký hiệu toán học tổng thể</h2>
+    <p>Để đảm bảo tính nhất quán tuyệt đối giữa giải thuật toán học trên server và mô hình dựng 3D đồ họa trên trình duyệt, hệ tọa độ Descartes 3D được quy ước như sau:</p>
+    <ul>
+        <li><strong>Trục \(X\) (Length - Chiều dài):</strong> Từ \(0 \to cL\) (chiều dọc từ vách trong cùng ra cửa container).</li>
+        <li><strong>Trục \(Y\) (Height - Chiều cao):</strong> Từ \(0 \to cH\) (từ mặt sàn lên trần container).</li>
+        <li><strong>Trục \(Z\) (Width - Chiều rộng):</strong> Từ \(0 \to cW\) (chiều ngang từ vách trái sang vách phải).</li>
+    </ul>
+    <p>Mỗi kiện hàng hoặc tấm pallet được quản lý dưới dạng khối hộp hình học định hướng theo các trục <strong>AABB (Axis-Aligned Bounding Box)</strong> xác định bởi bộ 6 tham số: \((x, y, z, l, h, w)\).</p>
+
+    <!-- PHẦN 3 -->
+    <h2 id="sec3">3. Phân tích chi tiết 6 Ràng buộc kỹ thuật & Bóc tách tham số (Parameters)</h2>
+
+    <!-- 3.1 -->
+    <h3 id="sec3-1">3.1. Ràng buộc biên lòng Container (Boundary Constraints - Formula 3.2 đến 3.5)</h3>
+    
+    <div class="formula-card">
+        <div class="formula-title">Công thức toán học lý thuyết (Formula 3.2 - 3.5):</div>
+        $$x_i + \Delta x_i \le L + M(1 - u_i), \quad \forall i \in I \tag{3.2}$$
+        $$z_i + \Delta z_i \le W + M(1 - u_i), \quad \forall i \in I \tag{3.3}$$
+        $$y_i + \Delta y_i \le H + M(1 - u_i), \quad \forall i \in I \tag{3.4}$$
+        $$x_i, y_i, z_i \ge 0, \quad \forall i \in I \tag{3.5}$$
+    </div>
+
+    <div class="info-box">
+        <strong>Ý nghĩa nghiệp vụ thực tế:</strong> Kiện hàng bắt buộc phải nằm hoàn toàn trong không gian lọt lòng hữu dụng của vỏ container. Nếu vi phạm, hàng hóa sẽ bị nhô ra ngoài vách thùng, gây va quệt khi cẩu bốc xếp hoặc không thể đóng được cửa container.
+    </div>
+
+    <h4>Bảng chi tiết các tham số của công thức (3.2 - 3.5):</h4>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Ký hiệu Toán</th>
+                <th style="width: 22%;">Tên tham số & Ý nghĩa</th>
+                <th style="width: 16%;">Miền giá trị</th>
+                <th style="width: 18%;">Biến trong Code</th>
+                <th>Giải thích vai trò kỹ thuật</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(i \in I\)</td>
+                <td>Chỉ số định danh kiện hàng</td>
+                <td>\(1, 2, \dots, N_{total}\)</td>
+                <td class="param-code">box_idx, box['id']</td>
+                <td>Định danh kiện hàng đang được duyệt trong tập hợp các kiện cần xếp.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(x_i, y_i, z_i\)</td>
+                <td>Tọa độ gốc của kiện hàng \(i\)</td>
+                <td>\(\mathbb{R}_{\ge 0}\) (mét)</td>
+                <td class="param-code">px, py, pz</td>
+                <td>Tọa độ góc dưới - sau - trái (điểm cực trị ứng viên) đặt kiện hàng trong lòng container.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(\Delta x_i, \Delta y_i, \Delta z_i\)</td>
+                <td>Kích thước kiện \(i\) sau xoay</td>
+                <td>\(\mathbb{R}_{> 0}\) (mét)</td>
+                <td class="param-code">rl, rh, rw</td>
+                <td>Chiều dài, chiều cao và chiều rộng thực tế của kiện hàng tương ứng với góc quay được chọn.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(L, W, H\)</td>
+                <td>Kích thước lòng container</td>
+                <td>\(\mathbb{R}_{> 0}\) (mét)</td>
+                <td class="param-code">cL, cW, cH (eff_L, eff_W, eff_H)</td>
+                <td>Kích thước giới hạn của khoang chứa. Nếu có lót pallet sàn, \(eff\_H = cH - pH\).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(u_i\)</td>
+                <td>Biến nhị phân quyết định xếp</td>
+                <td>\(\{0, 1\}\)</td>
+                <td class="param-code">best_pt is not None</td>
+                <td>\(u_i = 1\): kiện được chấp nhận xếp vào container; \(u_i = 0\): kiện bị từ chối/bỏ lại.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(M\)</td>
+                <td>Hằng số Big-M (rất lớn)</td>
+                <td>\(M \ge \max(L, W, H)\)</td>
+                <td class="param-code">Không cần (Heuristic)</td>
+                <td>Công cụ nới lỏng ràng buộc trong MILP. Khi \(u_i=1 \implies M(1-u_i)=0\) (ràng buộc có hiệu lực). Khi \(u_i=0 \implies M(1-u_i)=M\) (ràng buộc bị vô hiệu).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="code-container">
+        <div class="code-tag">Ánh xạ trong app.py (Dòng 216)</div>
+<pre># Kiểm tra trực tiếp điều kiện hình học mà không cần biến Big-M:
+if px + rl &lt;= eff_L + 0.001 and py + rh &lt;= eff_H + 0.001 and pz + rw &lt;= eff_W + 0.001:</pre>
+    </div>
+
+    <!-- 3.2 -->
+    <h3 id="sec3-2">3.2. Ràng buộc chống va chạm không gian 3D (Non-Overlap - Formula 3.6 & Hệ tách trục)</h3>
+    
+    <div class="formula-card">
+        <div class="formula-title">Công thức toán học lý thuyết (Formula 3.6 & Hệ 6 Bất đẳng thức tách trục):</div>
+        Hai kiện \(i\) và \(j\) bất kỳ (\(i \neq j\)) khi cùng được xếp (\(u_i = u_j = 1\)) không được giao thoa thể tích:
+        $$\begin{aligned}
+        x_i + \Delta x_i &\le x_j + M(1 - a_{ij}) \tag{Trục X: i ở bên trái j} \\
+        x_j + \Delta x_j &\le x_i + M(1 - b_{ij}) \tag{Trục X: i ở bên phải j} \\
+        z_i + \Delta z_i &\le z_j + M(1 - c_{ij}) \tag{Trục Z: i ở phía sau j} \\
+        z_j + \Delta z_j &\le z_i + M(1 - d_{ij}) \tag{Trục Z: i ở phía trước j} \\
+        y_i + \Delta y_i &\le y_j + M(1 - e_{ij}) \tag{Trục Y: i ở dưới sàn j} \\
+        y_j + \Delta y_j &\le y_i + M(1 - f_{ij}) \tag{Trục Y: i ở trên nóc j}
+        \end{aligned}$$
+        Kèm điều kiện bắt buộc:
+        $$a_{ij} + b_{ij} + c_{ij} + d_{ij} + e_{ij} + f_{ij} \ge u_i + u_j - 1, \quad \forall i < j \in I \tag{3.6}$$
+    </div>
+
+    <div class="info-box">
+        <strong>Ý nghĩa nghiệp vụ thực tế:</strong> Hai kiện hàng là vật thể rắn bất khả xâm phạm, không thể đè lấn hoặc chiếm cùng một tọa độ không gian thể tích (xuyên thấu vật lý). Nếu vi phạm, mô phỏng sẽ cho kết quả ảo không thể thực hiện ngoài đời thực.
+    </div>
+
+    <h4>Bảng chi tiết các tham số của công thức (3.6):</h4>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Ký hiệu Toán</th>
+                <th style="width: 22%;">Tên tham số & Ý nghĩa</th>
+                <th style="width: 16%;">Miền giá trị</th>
+                <th style="width: 18%;">Biến trong Code</th>
+                <th>Giải thích vai trò kỹ thuật</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(i, j\)</td>
+                <td>Cặp kiện hàng so sánh</td>
+                <td>\(i < j \in I\)</td>
+                <td class="param-code">(nx, ...), (px, ...)</td>
+                <td>Cặp hai kiện hàng bất kỳ đang xét điều kiện không va chạm lẫn nhau.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(a_{ij}, b_{ij}\)</td>
+                <td>Biến chỉ thị vị trí trục \(X\)</td>
+                <td>\(\{0, 1\}\)</td>
+                <td class="param-code">nx+nl &le; px / px+pl &le; nx</td>
+                <td>\(a_{ij}=1\): kiện \(i\) nằm hoàn toàn bên trái kiện \(j\). \(b_{ij}=1\): kiện \(i\) nằm hoàn toàn bên phải kiện \(j\).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(c_{ij}, d_{ij}\)</td>
+                <td>Biến chỉ thị vị trí trục \(Z\)</td>
+                <td>\(\{0, 1\}\)</td>
+                <td class="param-code">nz+nw &le; pz / pz+pw &le; nz</td>
+                <td>\(c_{ij}=1\): kiện \(i\) nằm hoàn toàn phía sau kiện \(j\). \(d_{ij}=1\): kiện \(i\) nằm hoàn toàn phía trước kiện \(j\).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(e_{ij}, f_{ij}\)</td>
+                <td>Biến chỉ thị vị trí trục \(Y\)</td>
+                <td>\(\{0, 1\}\)</td>
+                <td class="param-code">ny+nh &le; py / py+ph &le; ny</td>
+                <td>\(e_{ij}=1\): kiện \(i\) nằm hoàn toàn dưới đáy kiện \(j\). \(f_{ij}=1\): kiện \(i\) nằm hoàn toàn trên nóc kiện \(j\).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(u_i + u_j - 1\)</td>
+                <td>Vế phải điều kiện kích hoạt</td>
+                <td>\(\{-1, 0, 1\}\)</td>
+                <td class="param-code">placed_tuples loop</td>
+                <td>Khi cả hai cùng xếp (\(u_i=u_j=1\)), vế phải \(= 1\), ép tổng 6 biến chỉ thị \(\ge 1\) (phải tách nhau ít nhất trên 1 hướng). Nếu 1 trong 2 không xếp, vế phải \(\le 0\) (không cần xét).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="code-container">
+        <div class="code-tag">Ánh xạ trong app.py (Dòng 63-72 - Hàm check_overlap_fast)</div>
+<pre>def check_overlap_fast(nx, ny, nz, nl, nw, nh, placed_tuples):
+    for (px, py, pz, pl, pw, ph) in placed_tuples:
+        # Nếu cả 6 hướng tách rời đều bị vi phạm -> GIAO NHAU (VA CHẠM)
+        if not (nx + nl &lt;= px + 0.001 or  # a_ij = 1
+                px + pl &lt;= nx + 0.001 or  # b_ij = 1
+                ny + nh &lt;= py + 0.001 or  # e_ij = 1
+                py + ph &lt;= ny + 0.001 or  # f_ij = 1
+                nz + nw &lt;= pz + 0.001 or  # c_ij = 1
+                pz + pw &lt;= nz + 0.001):   # d_ij = 1
+            return True # Va chạm
+    return False # An toàn</pre>
+    </div>
+
+    <!-- 3.3 -->
+    <h3 id="sec3-3">3.3. Ràng buộc diện tích tiếp xúc nâng đỡ trọng lực (Support Area &ge; 75%)</h3>
+    
+    <div class="formula-card">
+        <div class="formula-title">Công thức toán học tính diện tích tiếp xúc:</div>
+        Với kiện hàng \(i\) có mặt đáy ở cao độ \(y_i > 0\), diện tích đáy là \(S_{\text{base}}(i) = \Delta x_i \cdot \Delta z_i\). 
+        Diện tích tiếp xúc giao thoa với kiện \(j\) nằm ngay dưới đáy kiện \(i\) (\(|(y_j + \Delta y_j) - y_i| \le \varepsilon\)):
+        $$\begin{cases}
+        \Delta X_{ij} = \max\left(0, \min(x_i + \Delta x_i, x_j + \Delta x_j) - \max(x_i, x_j)\right) \\
+        \Delta Z_{ij} = \max\left(0, \min(z_i + \Delta z_i, z_j + \Delta z_j) - \max(z_i, z_j)\right)
+        \end{cases}$$
+        $$S_{\text{overlap}}(i, j) = \Delta X_{ij} \cdot \Delta Z_{ij}$$
+        Ràng buộc tỷ lệ diện tích nâng đỡ an toàn:
+        $$\frac{\sum_{j \in \text{Under}(i)} S_{\text{overlap}}(i, j)}{S_{\text{base}}(i)} \ge \alpha = 75\%$$
+    </div>
+
+    <div class="info-box">
+        <strong>Ý nghĩa nghiệp vụ thực tế:</strong> Hàng hóa không thể bay lơ lửng giữa không trung. Hơn nữa, nếu diện tích tiếp xúc đỡ bên dưới quá nhỏ (ví dụ chỉ đỡ 20-30% ở mép), kiện hàng sẽ bị bấp bênh, mất thăng bằng và đổ sập khi xe phanh gấp hoặc tàu lắc lư trên biển. Ngưỡng 75% là tiêu chuẩn vàng trong an toàn đóng gói công nghiệp.
+    </div>
+
+    <h4>Bảng chi tiết các tham số của công thức nâng đỡ:</h4>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Ký hiệu Toán</th>
+                <th style="width: 22%;">Tên tham số & Ý nghĩa</th>
+                <th style="width: 16%;">Miền giá trị</th>
+                <th style="width: 18%;">Biến trong Code</th>
+                <th>Giải thích vai trò kỹ thuật</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(S_{\text{base}}(i)\)</td>
+                <td>Diện tích mặt đáy kiện \(i\)</td>
+                <td>\(\mathbb{R}_{> 0}\) (\(\text{m}^2\))</td>
+                <td class="param-code">base_area = nl * nw</td>
+                <td>Tổng diện tích bề mặt tiếp xúc đáy của kiện hàng đang cần đặt.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(\text{Under}(i)\)</td>
+                <td>Tập các kiện hàng nằm ngay dưới</td>
+                <td>Tập con \(\text{Placed}\)</td>
+                <td class="param-code">abs((py + ph) - ny) &le; 0.001</td>
+                <td>Tập hợp tất cả các kiện đã xếp có mặt trên tiếp xúc sát với mặt đáy kiện \(i\) (sai lệch \(\le 1\,\text{mm}\)).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(S_{\text{overlap}}(i, j)\)</td>
+                <td>Diện tích giao thoa đỡ 2D</td>
+                <td>\(\mathbb{R}_{\ge 0}\) (\(\text{m}^2\))</td>
+                <td class="param-code">overlap_area</td>
+                <td>Phần diện tích hình chữ nhật giao nhau giữa đáy kiện \(i\) và nóc kiện \(j\).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(\alpha\)</td>
+                <td>Ngưỡng nâng đỡ tối thiểu</td>
+                <td>\([0, 1]\) (Hằng số: \(0.75\))</td>
+                <td class="param-code">threshold = 0.75</td>
+                <td>Hệ số an toàn trọng lực (75%). Đáy kiện phải được nâng đỡ ít nhất 3/4 diện tích bề mặt.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="code-container">
+        <div class="code-tag">Ánh xạ trong app.py (Dòng 74-92 - Hàm check_support_fast)</div>
+<pre>def check_support_fast(nx, ny, nz, nl, nw, nh, placed_tuples, threshold=0.75):
+    if ny &lt;= 0.001: return True  # Đặt trực tiếp trên sàn -> Luôn được đỡ 100%
+    base_area = nl * nw
+    supported_area = 0.0
+    for (px, py, pz, pl, pw, ph) in placed_tuples:
+        if abs((py + ph) - ny) &lt;= 0.001:
+            ix_min = max(nx, px); ix_max = min(nx + nl, px + pl)
+            iz_min = max(nz, pz); iz_max = min(nz + nw, pz + pw)
+            if ix_min &lt; ix_max and iz_min &lt; iz_max:
+                supported_area += (ix_max - ix_min) * (iz_max - iz_min)
+    return (supported_area / base_area) &gt;= threshold</pre>
+    </div>
+
+    <!-- 3.4 -->
+    <h3 id="sec3-4">3.4. Ràng buộc bảo vệ hàng dễ vỡ (Fragile Crush Protection)</h3>
+    
+    <div class="formula-card">
+        <div class="formula-title">Công thức toán học loại trừ va đập:</div>
+        Tuyệt đối không để kiện hàng thường (\(Fragile_i = 0\)) đè lên nóc bất kỳ kiện hàng dễ vỡ (\(Fragile_j = 1\)):
+        $$S_{\text{overlap}}(i, j) = 0, \quad \forall j \in \{k \in \text{Placed} \mid Fragile_k = 1 \;\land\; |(y_k + \Delta y_k) - y_i| \le \varepsilon\}$$
+    </div>
+
+    <div class="danger-box">
+        <strong>Ý nghĩa nghiệp vụ thực tế:</strong> Các mặt hàng như đồ thủy tinh, gốm sứ, màn hình điện tử, bóng đèn có khả năng chịu nén thẳng đứng cực kỳ kém. Đặt một kiện hàng nặng hoặc hàng thường lên trên sẽ gây bẹp nát và vỡ hàng, phát sinh chi phí đền bù bảo hiểm nghiêm trọng.
+    </div>
+
+    <h4>Bảng chi tiết các tham số của công thức chống đè vỡ:</h4>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Ký hiệu Toán</th>
+                <th style="width: 22%;">Tên tham số & Ý nghĩa</th>
+                <th style="width: 16%;">Miền giá trị</th>
+                <th style="width: 18%;">Biến trong Code</th>
+                <th>Giải thích vai trò kỹ thuật</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(Fragile_i\)</td>
+                <td>Thuộc tính dễ vỡ của kiện \(i\)</td>
+                <td>\(\{0, 1\}\) (Boolean)</td>
+                <td class="param-code">is_fragile</td>
+                <td>\(1\): kiện là hàng dễ vỡ; \(0\): kiện là hàng thông thường có khả năng chịu lực.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(S_{\text{overlap}}(i, j)\)</td>
+                <td>Diện tích giao cắt mặt phẳng</td>
+                <td>\(\mathbb{R}_{\ge 0}\) (\(\text{m}^2\))</td>
+                <td class="param-code">overlap_x and overlap_z</td>
+                <td>Hình chiếu giao nhau theo phương ngang. Ràng buộc yêu cầu đại lượng này bắt buộc bằng 0 (không giao cắt).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(\varepsilon\)</td>
+                <td>Dung sai tiếp xúc bề mặt</td>
+                <td>\(0.001\,\text{m}\) (1mm)</td>
+                <td class="param-code">0.001</td>
+                <td>Độ dày lớp tiếp xúc hình học giữa mặt đáy kiện trên và mặt nóc kiện dưới.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="code-container">
+        <div class="code-tag">Ánh xạ trong app.py (Dòng 94-104 - Hàm check_fragile_crush)</div>
+<pre>def check_fragile_crush(px, py, pz, rl, rw, rh, is_fragile, placed_boxes):
+    if is_fragile: return False  # Bản thân kiện đang xếp là dễ vỡ thì được phép đặt lên kiện thường
+    for p_box in placed_boxes:
+        if p_box['is_fragile']:
+            if abs(py - (p_box['y'] + p_box['h'])) &lt;= 0.001: # Nằm ngay trên nóc kiện dễ vỡ
+                overlap_x = (px + 0.001 &lt; p_box['x'] + p_box['l']) and (px + rl - 0.001 &gt; p_box['x'])
+                overlap_z = (pz + 0.001 &lt; p_box['z'] + p_box['w']) and (pz + rw - 0.001 &gt; p_box['z'])
+                if overlap_x and overlap_z:
+                    return True # Phát hiện nguy cơ đè vỡ -> Từ chối vị trí ngay
+    return False</pre>
+    </div>
+
+    <!-- 3.5 -->
+    <h3 id="sec3-5">3.5. Ràng buộc phân bổ trọng tâm Container (Center of Gravity - CoG)</h3>
+    
+    <div class="formula-card">
+        <div class="formula-title">Công thức toán học kiểm soát tọa độ trọng tâm:</div>
+        Tọa độ trọng tâm dọc (\(X_{\text{CoG}}\)) và ngang (\(Z_{\text{CoG}}\)) của toàn bộ hệ thống:
+        $$X_{\text{CoG}} = \frac{\sum_{i=1}^{N_{placed}} m_i \cdot \left(x_i + \frac{\Delta x_i}{2}\right)}{\sum_{i=1}^{N_{placed}} m_i} \approx \frac{L}{2} \pm 5\%$$
+        $$Z_{\text{CoG}} = \frac{\sum_{i=1}^{N_{placed}} m_i \cdot \left(z_i + \frac{\Delta z_i}{2}\right)}{\sum_{i=1}^{N_{placed}} m_i} \approx \frac{W}{2} \pm 5\%$$
+    </div>
+
+    <div class="info-box">
+        <strong>Ý nghĩa nghiệp vụ thực tế:</strong> Container đặt trên rơ-moóc di chuyển với tốc độ cao. Nếu toàn bộ hàng dồn lệch sang một bên vách quá 5%, trọng tâm xe bị lệch tâm nghiêm trọng, sinh ra mô-men lật xe khi vào cua gấp hoặc gió tạt ngang.
+    </div>
+
+    <h4>Bảng chi tiết các tham số của công thức trọng tâm:</h4>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Ký hiệu Toán</th>
+                <th style="width: 22%;">Tên tham số & Ý nghĩa</th>
+                <th style="width: 16%;">Miền giá trị</th>
+                <th style="width: 18%;">Biến trong Code</th>
+                <th>Giải thích vai trò kỹ thuật</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(m_i\)</td>
+                <td>Khối lượng của kiện hàng \(i\)</td>
+                <td>\(\mathbb{R}_{> 0}\) (kg)</td>
+                <td class="param-code">box['weight']</td>
+                <td>Khối lượng kiện hàng đóng vai trò trọng số (weighting factor) trong bài toán tâm khối.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(x_i + \frac{\Delta x_i}{2}\)</td>
+                <td>Tọa độ tâm hình học trục \(X\)</td>
+                <td>\(\mathbb{R}_{> 0}\) (mét)</td>
+                <td class="param-code">box.x + box.l / 2</td>
+                <td>Tọa độ tâm khối cục bộ của kiện \(i\) theo chiều dài container.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(z_i + \frac{\Delta z_i}{2}\)</td>
+                <td>Tọa độ tâm hình học trục \(Z\)</td>
+                <td>\(\mathbb{R}_{> 0}\) (mét)</td>
+                <td class="param-code">box.z + box.w / 2</td>
+                <td>Tọa độ tâm khối cục bộ của kiện \(i\) theo chiều rộng container.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(\frac{W}{2} \pm 5\%\)</td>
+                <td>Vùng dung sai an toàn trọng tâm</td>
+                <td>\([0.45W, 0.55W]\)</td>
+                <td class="param-code">offset_Z = (cW - eff_W) / 2</td>
+                <td>Dải cho phép lệch tâm tối đa 5% so với trục đối xứng trung tâm container.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="code-container">
+        <div class="code-tag">Giải pháp kỹ thuật trong app.py (Dòng 265-272)</div>
+<pre># Căn giữa hoàn hảo: ép Z_CoG trùng khít tâm trục ngang W/2
+offset_Z = (cW - eff_W) / 2.0 if use_pallet else 0.0
+
+for b in placed_boxes:
+    b['z'] += offset_Z  # Đẩy toàn bộ kiện hàng đối xứng vào giữa lòng xe</pre>
+    </div>
+
+    <!-- 3.6 -->
+    <h3 id="sec3-6">3.6. Ràng buộc tải trọng tối đa & Kích hoạt Pallet động</h3>
+    
+    <div class="formula-card">
+        <div class="formula-title">Công thức toán học giới hạn tải trọng:</div>
+        $$\sum_{i=1}^{N_{placed}} m_i + |\text{Pallets}_{\text{activated}}| \cdot m_{\text{pallet}} \le M_{max}$$
+    </div>
+
+    <div class="danger-box">
+        <strong>Ý nghĩa nghiệp vụ thực tế:</strong> Mỗi loại container có hạn mức tải trọng cho phép (Max Payload, ví dụ container 40HC chở tối đa khoảng 28,000 kg). Xếp quá tải sẽ bị phạt nặng tại các trạm cân cảng biển, làm gãy dầm xe rơ-moóc hoặc gây sập sàn tàu chở hàng.
+    </div>
+
+    <h4>Bảng chi tiết các tham số của công thức tải trọng:</h4>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 14%;">Ký hiệu Toán</th>
+                <th style="width: 22%;">Tên tham số & Ý nghĩa</th>
+                <th style="width: 16%;">Miền giá trị</th>
+                <th style="width: 18%;">Biến trong Code</th>
+                <th>Giải thích vai trò kỹ thuật</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(\sum m_i\)</td>
+                <td>Tổng trọng lượng các kiện hàng</td>
+                <td>\(\mathbb{R}_{\ge 0}\) (kg)</td>
+                <td class="param-code">total_w</td>
+                <td>Tổng khối lượng của tất cả các kiện carton đã xếp thành công.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(|\text{Pallets}_{\text{activated}}|\)</td>
+                <td>Số tấm pallet sàn thực tế sử dụng</td>
+                <td>\(\mathbb{N}_0\) (tấm)</td>
+                <td class="param-code">len(activated_pallets)</td>
+                <td>Số tấm pallet sàn đã được kích hoạt (có hàng đè lên). Các tấm pallet không có hàng đè sẽ không được tính tải.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(m_{\text{pallet}}\)</td>
+                <td>Khối lượng một tấm pallet</td>
+                <td>\(\mathbb{R}_{> 0}\) (kg)</td>
+                <td class="param-code">pWeight (15kg - 20kg)</td>
+                <td>Trọng lượng bản thân của tấm pallet (Pallet Châu Á: 15kg, Pallet Châu Âu: 20kg).</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(M_{max}\)</td>
+                <td>Tải trọng tối đa cho phép</td>
+                <td>\(\mathbb{R}_{> 0}\) (kg)</td>
+                <td class="param-code">maxW, maxWeight (28000 kg)</td>
+                <td>Hạn mức tải trọng tối đa theo thiết kế kỹ thuật của vỏ container.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="code-container">
+        <div class="code-tag">Ánh xạ trong app.py (Dòng 221-234)</div>
+<pre># Kích hoạt động: Chiếu hình học đáy hàng xuống mặt sàn pallet
+actually_new = new_cells - activated_pallets
+additional_weight = box['weight'] + len(actually_new) * pWeight
+
+# Kiểm tra tổng tải không được vượt quá maxW
+if total_w + additional_weight &lt;= maxW:
+    best_pt, best_rot, best_new_pallets = pt, rot, actually_new</pre>
+    </div>
+
+    <!-- PHẦN 4 -->
+    <h2 id="sec4">4. Thuật toán tối ưu bố trí mặt sàn Pallet (6 Kịch bản Heuristic)</h2>
+    <p>Hàm <code>generate_optimal_pallet_layout(cL, cW, pL, pW)</code> giải bài toán tối ưu 2 mục tiêu:</p>
+    $$\max \quad \left( |\text{Pallets}|, \; \sum_{p \in \text{Pallets}} (p.l \cdot p.w) \right)$$
+    <ol>
+        <li><strong>Kịch bản 1 (Dọc toàn bộ):</strong> \(cols_1 = \lfloor cL / pL \rfloor\), \(rows_1 = \lfloor cW / pW \rfloor\).</li>
+        <li><strong>Kịch bản 2 (Ngang toàn bộ - Xoay 90°):</strong> \(cols_2 = \lfloor cL / pW \rfloor\), \(rows_2 = \lfloor cW / pL \rfloor\).</li>
+        <li><strong>Kịch bản 3 (Hỗn hợp trục \(X\) - Dọc trước, Ngang sau):</strong> Cắt tại \(x_{\text{split}} = c_A \cdot pL\). Khoảng thừa \(rem_L = cL - x_{\text{split}}\) nếu \(\ge pW\) thì xếp các cột xoay ngang.</li>
+        <li><strong>Kịch bản 4 (Hỗn hợp trục \(X\) - Ngang trước, Dọc sau):</strong> Cắt tại \(x_{\text{split}} = c_A \cdot pW\). Khoảng thừa \(rem_L \ge pL\) thì xếp các cột dọc.</li>
+        <li><strong>Kịch bản 5 (Hỗn hợp trục \(Z\) - Dọc sát vách, Ngang bên ngoài):</strong> Cắt tại \(z_{\text{split}} = r_A \cdot pW\). Khoảng rộng \(rem_W \ge pL\) thì xếp các dãy ngang.</li>
+        <li><strong>Kịch bản 6 (Hỗn hợp trục \(Z\) - Ngang sát vách, Dọc bên ngoài):</strong> Cắt tại \(z_{\text{split}} = r_A \cdot pL\). Khoảng rộng \(rem_W \ge pW\) thì xếp các dãy dọc.</li>
+    </ol>
+
+    <!-- PHẦN 5 -->
+    <h2 id="sec5">5. Phân tích tham số các chỉ số KPI đánh giá hiệu quả (Formula 3.17 - 3.19)</h2>
+    
+    <!-- KPI 1 -->
+    <div class="formula-card">
+        <div class="formula-title">1. Hệ số sử dụng thể tích (Volume Utilization Rate - \(U_V\)):</div>
+        $$U_V = \left( \frac{\sum_{i=1}^{N_{placed}} (l_i \cdot w_i \cdot h_i) + V_{\text{pallets}}}{L \cdot W \cdot H} \right) \times 100\% \tag{3.17}$$
+    </div>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 18%;">Tham số</th>
+                <th style="width: 25%;">Ý nghĩa đại lượng</th>
+                <th style="width: 18%;">Đơn vị</th>
+                <th style="width: 20%;">Biến Code</th>
+                <th>Mô tả</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(l_i \cdot w_i \cdot h_i\)</td>
+                <td>Thể tích của kiện hàng \(i\)</td>
+                <td>\(\text{m}^3\)</td>
+                <td class="param-code">data.total_vol_boxes</td>
+                <td>Tổng thể tích chiếm chỗ của các thùng carton đã xếp.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(V_{\text{pallets}}\)</td>
+                <td>Thể tích các tấm pallet lót sàn</td>
+                <td>\(\text{m}^3\)</td>
+                <td class="param-code">data.total_vol_pallets</td>
+                <td>Tổng thể tích chiếm chỗ của các tấm pallet đã kích hoạt.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(L \cdot W \cdot H\)</td>
+                <td>Tổng dung tích lọt lòng container</td>
+                <td>\(\text{m}^3\)</td>
+                <td class="param-code">containerVol</td>
+                <td>Dung tích chứa hàng lý thuyết của toàn bộ vỏ container.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(U_V\)</td>
+                <td>Tỷ lệ lấp đầy thể tích</td>
+                <td>\(\%\)</td>
+                <td class="param-code">kpi-fill</td>
+                <td>Hiệu suất sử dụng không gian container (càng cao càng tối ưu).</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="code-container">
+        <div class="code-tag">main.js: Dòng 311, 317</div>
+<pre>const containerVol = cL * cW * cH;
+const totalUsedVol = data.total_vol_boxes + data.total_vol_pallets;
+document.getElementById('kpi-fill').innerText = ((totalUsedVol / containerVol) * 100).toFixed(1) + "%";</pre>
+    </div>
+
+    <!-- KPI 2 -->
+    <div class="formula-card">
+        <div class="formula-title">2. Hệ số sử dụng tải trọng (Weight Utilization Rate - \(U_W\)):</div>
+        $$U_W = \left( \frac{\sum_{i=1}^{N_{placed}} m_i + M_{\text{pallets}}}{M_{max}} \right) \times 100\% \tag{3.18}$$
+    </div>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 18%;">Tham số</th>
+                <th style="width: 25%;">Ý nghĩa đại lượng</th>
+                <th style="width: 18%;">Đơn vị</th>
+                <th style="width: 20%;">Biến Code</th>
+                <th>Mô tả</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(\sum m_i + M_{\text{pallets}}\)</td>
+                <td>Tổng tải trọng đã xếp (Hàng + Pallet)</td>
+                <td>kg</td>
+                <td class="param-code">data.total_weight</td>
+                <td>Tổng tải trọng thực tế đặt lên sàn xe.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(M_{max}\)</td>
+                <td>Tải trọng tối đa cho phép</td>
+                <td>kg</td>
+                <td class="param-code">maxWeight</td>
+                <td>Hạn mức tải trọng quy định của container.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(U_W\)</td>
+                <td>Tỷ lệ sử dụng tải trọng</td>
+                <td>\(\%\)</td>
+                <td class="param-code">kpi-weight-fill</td>
+                <td>Mức độ khai thác sức chở tải của phương tiện.</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="code-container">
+        <div class="code-tag">main.js: Dòng 321</div>
+<pre>document.getElementById('kpi-weight-fill').innerText = ((data.total_weight / maxWeight) * 100).toFixed(1) + "%";</pre>
+    </div>
+
+    <!-- KPI 3 -->
+    <div class="formula-card">
+        <div class="formula-title">3. Tỷ lệ đóng gói thành công (Loading Success Ratio - \(R_S\)):</div>
+        $$R_S = \left( \frac{N_{placed}}{N_{total}} \right) \times 100\% \tag{3.19}$$
+    </div>
+    <table class="param-table">
+        <thead>
+            <tr>
+                <th style="width: 18%;">Tham số</th>
+                <th style="width: 25%;">Ý nghĩa đại lượng</th>
+                <th style="width: 18%;">Đơn vị</th>
+                <th style="width: 20%;">Biến Code</th>
+                <th>Mô tả</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-sym">\(N_{placed}\)</td>
+                <td>Số lượng kiện đã xếp thành công</td>
+                <td>kiện</td>
+                <td class="param-code">counts[box.id]</td>
+                <td>Số lượng thùng hàng thực tế đã được xếp lọt vào trong container.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(N_{total}\)</td>
+                <td>Tổng số lượng kiện yêu cầu</td>
+                <td>kiện</td>
+                <td class="param-code">requestedQty</td>
+                <td>Số lượng thùng hàng đơn hàng yêu cầu đóng gói.</td>
+            </tr>
+            <tr>
+                <td class="param-sym">\(R_S\)</td>
+                <td>Tỷ lệ đóng gói thành công</td>
+                <td>\(\%\)</td>
+                <td class="param-code">kpi-${box.id}</td>
+                <td>Tỷ lệ % đơn hàng được đáp ứng trọn vẹn trong một chuyến xe.</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="code-container">
+        <div class="code-tag">main.js: Dòng 299</div>
+<pre>document.getElementById(`kpi-${box.id}`).innerText = `${counts[box.id]} / ${requestedQty}`;</pre>
+    </div>
+
+    <!-- PHẦN 6 -->
+    <h2 id="sec6">6. Bảng đối chiếu tổng hợp (Toán học vs. Code)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Ràng buộc / Chỉ số</th>
+                <th>Ký hiệu Mô hình Toán học</th>
+                <th>Hàm / Logic trong Code</th>
+                <th>Tệp & Dòng mã</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Giới hạn biên</strong></td>
+                <td>\((3.2) - (3.5): x_i + \Delta x_i \le L + M(1-u_i)\)</td>
+                <td><code>px + rl &lt;= eff_L</code></td>
+                <td><code>app.py: 216</code></td>
+            </tr>
+            <tr>
+                <td><strong>Chống va chạm 3D</strong></td>
+                <td>\((3.6): \sum a_{ij} \dots \ge u_i + u_j - 1\)</td>
+                <td><code>check_overlap_fast()</code></td>
+                <td><code>app.py: 63-72</code></td>
+            </tr>
+            <tr>
+                <td><strong>Độ vững chân đỡ</strong></td>
+                <td>\(\sum S_{\text{overlap}} / S_{\text{base}} \ge 75\%\)</td>
+                <td><code>check_support_fast()</code></td>
+                <td><code>app.py: 74-92</code></td>
+            </tr>
+            <tr>
+                <td><strong>Chống đè hàng vỡ</strong></td>
+                <td>\(S_{\text{overlap}}(i, j) = 0 \quad (\forall Fragile_j = 1)\)</td>
+                <td><code>check_fragile_crush()</code></td>
+                <td><code>app.py: 94-104</code></td>
+            </tr>
+            <tr>
+                <td><strong>Cân bằng trọng tâm</strong></td>
+                <td>\(Z_{\text{CoG}} \approx W/2 \pm 5\%\)</td>
+                <td><code>offset_Z = (cW - eff_W) / 2.0</code></td>
+                <td><code>app.py: 265</code></td>
+            </tr>
+            <tr>
+                <td><strong>Tải trọng cho phép</strong></td>
+                <td>\(\sum m_i + M_{\text{pallets}} \le M_{max}\)</td>
+                <td><code>total_w + additional_weight &lt;= maxW</code></td>
+                <td><code>app.py: 234</code></td>
+            </tr>
+            <tr>
+                <td><strong>KPI Thể tích</strong></td>
+                <td>\((3.17): U_V = (V_{\text{used}} / V_{\text{cont}}) \times 100\%\)</td>
+                <td><code>(totalUsedVol / containerVol) * 100</code></td>
+                <td><code>main.js: 317</code></td>
+            </tr>
+            <tr>
+                <td><strong>KPI Tải trọng</strong></td>
+                <td>\((3.18): U_W = (M_{\text{used}} / M_{max}) \times 100\%\)</td>
+                <td><code>(data.total_weight / maxWeight) * 100</code></td>
+                <td><code>main.js: 321</code></td>
+            </tr>
+            <tr>
+                <td><strong>KPI Thành công</strong></td>
+                <td>\((3.19): R_S = (N_{\text{placed}} / N_{\text{total}}) \times 100\%\)</td>
+                <td><code>counts[box.id] / requestedQty</code></td>
+                <td><code>main.js: 299</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

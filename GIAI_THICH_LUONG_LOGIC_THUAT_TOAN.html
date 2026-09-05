@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân Tích Chi Tiết Luồng Logic & Thuật Toán Sắp Xếp Container 3D (v3.3 gốc)</title>
+    <!-- Cấu hình MathJax chuẩn để hỗ trợ hiển thị công thức nếu có kết nối mạng -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --primary-dark: #003d80;
+            --primary-light: #e7f1ff;
+            --secondary: #495057;
+            --accent: #28a745;
+            --warning: #e65c00;
+            --danger: #dc3545;
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text: #212529;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 45px 55px;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+        }
+
+        header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 25px;
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 26px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        .toc {
+            background-color: var(--primary-light);
+            border: 1px solid #b8daff;
+            border-radius: 8px;
+            padding: 22px 30px;
+            margin-bottom: 35px;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            font-size: 17px;
+            text-transform: uppercase;
+        }
+
+        .toc ul {
+            margin: 0;
+            padding-left: 22px;
+        }
+
+        .toc li {
+            margin: 7px 0;
+        }
+
+        .toc a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: var(--primary);
+            border-left: 5px solid var(--primary);
+            padding-left: 12px;
+            margin-top: 45px;
+            margin-bottom: 15px;
+            font-size: 21px;
+        }
+
+        h3 {
+            color: #2b3035;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 17px;
+        }
+
+        p {
+            margin-bottom: 14px;
+        }
+
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 16px 20px;
+            margin: 18px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .highlight-box.warning {
+            background-color: #fff8e1;
+            border-left-color: var(--warning);
+        }
+
+        .highlight-box.danger {
+            background-color: #fdf2f2;
+            border-left-color: var(--danger);
+        }
+
+        .highlight-box.success {
+            background-color: #e8f5e9;
+            border-left-color: var(--accent);
+        }
+
+        .code-snippet {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 16px 20px;
+            border-radius: 6px;
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 13.5px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.5;
+        }
+
+        .code-title {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .grid-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .grid-card h4 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 15px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e9ecef;
+            color: #333;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        .pitch-box {
+            background: linear-gradient(135deg, #0056b3 0%, #002d62 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.25);
+        }
+
+        .pitch-box h3 {
+            color: #ffeb3b;
+            margin-top: 0;
+            text-transform: uppercase;
+        }
+
+        .pitch-box p {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        .math-sym {
+            font-weight: bold;
+            color: #004085;
+        }
+
+        .arrow-step {
+            display: inline-block;
+            margin: 0 4px;
+            color: #0056b3;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>PHÂN TÍCH TOÀN BỘ LUỒNG LOGIC & THUẬT TOÁN</h1>
+            <div class="meta-subtitle">Dự án: Chương trình Mô phỏng Sắp xếp Container 3D (Hỗ trợ Pallet sàn) - Phiên bản
+                v3.3 gốc</div>
+        </header>
+
+        <div class="toc">
+            <h3>Mục lục nội dung phân tích</h3>
+            <ul>
+                <li><a href="#phan1">1. Tổng quan hệ thống (Kiến trúc Frontend - Backend)</a></li>
+                <li><a href="#phan2">2. Hệ tọa độ và quy ước hình học không gian 3D</a></li>
+                <li><a href="#phan3">3. Thuật toán tối ưu mặt sàn Pallet (6 Phương án Heuristic)</a></li>
+                <li><a href="#phan4">4. Thuật toán xếp hộp 3D (Extreme Points & Heuristic First-Fit)</a></li>
+                <li><a href="#phan5">5. Bộ 5 ràng buộc kỹ thuật công nghiệp nghiêm ngặt</a></li>
+                <li><a href="#phan6">6. Hiệu chỉnh tọa độ & Căn tâm trọng tải Container</a></li>
+                <li><a href="#phan7">7. Kiến trúc hiển thị Three.js, Mô phỏng & Xuất Excel</a></li>
+            </ul>
+        </div>
+
+        <!-- PHẦN 1 -->
+        <h2 id="phan1">1. Tổng quan hệ thống (Kiến trúc Frontend - Backend)</h2>
+        <p>
+            Dự án giải quyết bài toán cốt lõi trong Logistics: <strong>3D Bin Packing Problem (3D-BPP)</strong> kết hợp
+            <strong>Tối ưu hóa bố trí mặt sàn Pallet</strong> (Container Loading Problem - CLP).
+        </p>
+        <div class="grid-cards">
+            <div class="grid-card">
+                <h4>Backend (Python - FastAPI / Pydantic)</h4>
+                <p><strong>File trung tâm:</strong> <code>app.py</code></p>
+                <ul>
+                    <li>Đảm nhiệm tính toán hình học 3D, không gian vector và điểm đặt.</li>
+                    <li>Chạy thuật toán tối ưu lưới pallet 6 phương án.</li>
+                    <li>Kiểm soát bộ 5 ràng buộc vật lý (biên, va chạm, đỡ trọng lực, chống đè vỡ, tải trọng).</li>
+                    <li>API Endpoint: <code>POST /api/pack</code> tiếp nhận thông số và trả về tọa độ chính xác của từng
+                        kiện hàng và tấm pallet.</li>
+                </ul>
+            </div>
+            <div class="grid-card">
+                <h4>Frontend (HTML5 / Three.js r128 / SheetJS)</h4>
+                <p><strong>Files trung tâm:</strong> <code>index.html</code>, <code>main.js</code>,
+                    <code>style.css</code>
+                </p>
+                <ul>
+                    <li>Thu thập kích thước container (20ft, 40ft, 40HC), cấu hình pallet và danh mục 10 loại thùng
+                        carton.</li>
+                    <li>Dựng mô hình 3D tương tác với góc xoay nhãn "THIS SIDE UP".</li>
+                    <li>Mô phỏng trình tự xếp hàng tuần tự theo thời gian thực (Simulation).</li>
+                    <li>Xuất báo cáo đánh giá hiệu suất ra file Excel chuyên nghiệp.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PHẦN 2 -->
+        <h2 id="phan2">2. Hệ tọa độ và quy ước hình học không gian 3D</h2>
+        <p>Để đảm bảo tính nhất quán tuyệt đối giữa giải thuật toán học trên server và mô hình dựng 3D đồ họa trên trình
+            duyệt, hệ tọa độ Descartes 3D được quy ước như sau:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Trục tọa độ</th>
+                    <th>Kích thước tương ứng</th>
+                    <th>Hướng không gian trong thực tế</th>
+                    <th>Phạm vi giá trị</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Trục X (Length)</strong></td>
+                    <td>Chiều dài (<i>cL</i>)</td>
+                    <td>Đi dọc từ vách trong cùng ra cửa container</td>
+                    <td><code>0 &le; x &le; cL</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Trục Y (Height)</strong></td>
+                    <td>Chiều cao (<i>cH</i>)</td>
+                    <td>Phương thẳng đứng: đi từ mặt sàn lên nóc trần</td>
+                    <td><code>0 &le; y &le; cH</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Trục Z (Width)</strong></td>
+                    <td>Chiều rộng (<i>cW</i>)</td>
+                    <td>Phương ngang: đi từ vách trái sang vách phải</td>
+                    <td><code>0 &le; z &le; cW</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Mỗi kiện hàng hoặc tấm pallet được quản lý dưới dạng khối hộp hình học định hướng theo các trục <strong>AABB
+                (Axis-Aligned Bounding Box)</strong> xác định bởi bộ 6 tham số: <code>(x, y, z, l, h, w)</code>.</p>
+
+        <!-- PHẦN 3 -->
+        <h2 id="phan3">3. Thuật toán tối ưu mặt sàn Pallet (<code>generate_optimal_pallet_layout</code>)</h2>
+        <p>
+            Thay vì chỉ xếp pallet theo một chiều đơn giản dẫn đến bỏ phí nhiều khoảng trống sát vách thùng hoặc phía
+            cửa, hàm <code>generate_optimal_pallet_layout(cL, cW, pL, pW)</code> thực hiện khảo sát <strong>6 phương án
+                phân chia không gian</strong> để tối đa hóa diện tích hữu dụng.
+        </p>
+
+        <div class="grid-cards">
+            <div class="grid-card">
+                <h4>Phương án 1: Dọc toàn bộ</h4>
+                <p>Toàn bộ pallet đặt dọc theo chiều dài container.<br>
+                    Số cột: <code>cols<sub>1</sub> = &lfloor;cL / pL&rfloor;</code><br>
+                    Số hàng: <code>rows<sub>1</sub> = &lfloor;cW / pW&rfloor;</code></p>
+            </div>
+            <div class="grid-card">
+                <h4>Phương án 2: Ngang toàn bộ (Xoay 90°)</h4>
+                <p>Toàn bộ pallet xoay ngang 90 độ.<br>
+                    Số cột: <code>cols<sub>2</sub> = &lfloor;cL / pW&rfloor;</code><br>
+                    Số hàng: <code>rows<sub>2</sub> = &lfloor;cW / pL&rfloor;</code></p>
+            </div>
+            <div class="grid-card">
+                <h4>Phương án 3: Hỗn hợp trục X (Dọc trước - Ngang sau)</h4>
+                <p>Xếp <i>c</i><sub>A</sub> cột pallet dọc ở phía trong cùng. Khoảng chiều dài thừa còn lại
+                    <code>rem<sub>L</sub> = cL - (c<sub>A</sub> &times; pL)</code> nếu <code>&ge; pW</code> sẽ được xếp
+                    lấp bằng các cột pallet xoay ngang.
+                </p>
+            </div>
+            <div class="grid-card">
+                <h4>Phương án 4: Hỗn hợp trục X (Ngang trước - Dọc sau)</h4>
+                <p>Xếp <i>c</i><sub>A</sub> cột pallet xoay ngang ở phía trong cùng. Khoảng chiều dài còn lại
+                    <code>rem<sub>L</sub> = cL - (c<sub>A</sub> &times; pW)</code> nếu <code>&ge; pL</code> sẽ tận dụng
+                    xếp các cột dọc.
+                </p>
+            </div>
+            <div class="grid-card">
+                <h4>Phương án 5: Hỗn hợp trục Z (Dọc vách - Ngang ngoài)</h4>
+                <p>Chia theo bề rộng thùng <i>cW</i>. Cho <i>r</i><sub>A</sub> hàng pallet dọc áp sát vách container.
+                    Khoảng rộng còn lại <code>rem<sub>W</sub> = cW - (r<sub>A</sub> &times; pW)</code> nếu
+                    <code>&ge; pL</code> sẽ xếp các hàng ngang chạy dọc thân xe.
+                </p>
+            </div>
+            <div class="grid-card">
+                <h4>Phương án 6: Hỗn hợp trục Z (Ngang vách - Dọc ngoài)</h4>
+                <p>Tương tự phương án 5 nhưng bố trí các hàng ngang áp sát vách trước, khoảng trống còn lại xếp pallet
+                    theo chiều dọc.</p>
+            </div>
+        </div>
+
+        <div class="highlight-box success">
+            <strong>Tiêu chí lựa chọn phương án tối ưu (Hàm mục tiêu):</strong>
+            <ol>
+                <li><strong>Ưu tiên 1:</strong> Chọn phương án xếp được <em>số lượng tấm pallet nhiều nhất</em>
+                    (<b>max(count)</b>).</li>
+                <li><strong>Ưu tiên 2 (Hòa điểm):</strong> Nếu số lượng bằng nhau, chọn phương án có <em>tổng diện tích
+                        bề mặt phủ sàn lớn nhất</em> (<b>max(area)</b>).</li>
+            </ol>
+            Kích thước không gian chứa hàng hiệu dụng sau khi lót pallet:
+            <ul>
+                <li>Chiều dài hiệu dụng: <code>eff_L = max(x + l)</code></li>
+                <li>Chiều rộng hiệu dụng: <code>eff_W = max(z + w)</code></li>
+                <li>Chiều cao hiệu dụng: <code>eff_H = cH - pH</code> (giảm trừ đúng bề dày tấm pallet <i>pH</i> =
+                    0.15m).</li>
+            </ul>
+        </div>
+
+        <!-- PHẦN 4 -->
+        <h2 id="phan4">4. Thuật toán xếp hộp 3D (Extreme Points & Heuristic First-Fit)</h2>
+
+        <h3>Bước 4.1: Tiền xử lý các trạng thái xoay không gian (<code>get_rotations</code>)</h3>
+        <p>Một khối hộp chữ nhật trong không gian 3 chiều có tối đa <strong>6 trạng thái quay</strong>:</p>
+        <ul>
+            <li><code>rtype = 0</code>: <code>(l, w, h)</code> - Chuẩn mặc định.</li>
+            <li><code>rtype = 1</code>: <code>(l, h, w)</code> - Lật nghiêng bên.</li>
+            <li><code>rtype = 2</code>: <code>(w, l, h)</code> - Xoay 90 độ trên mặt sàn (giữ nguyên chiều cao
+                <i>h</i>).
+            </li>
+            <li><code>rtype = 3</code>: <code>(w, h, l)</code> - Lật đứng cạnh.</li>
+            <li><code>rtype = 4</code>: <code>(h, l, w)</code> - Dựng đứng.</li>
+            <li><code>rtype = 5</code>: <code>(h, w, l)</code> - Dựng đứng.</li>
+        </ul>
+
+        <div class="highlight-box warning">
+            <strong>Ràng buộc chiều hướng "This Side Up" (<code>allow_flip == False</code>):</strong><br>
+            Khi người dùng bỏ chọn tùy chọn "Cho xoay" (áp dụng cho kiện hàng chứa chất lỏng, linh kiện nhạy cảm, đồ có
+            chiều cấm dựng ngược), thuật toán lập tức thu hẹp tập hợp ứng viên chỉ còn đúng 2 trạng thái quay quanh trục
+            thẳng đứng: <code>(l, w, h, 0)</code> và <code>(w, l, h, 2)</code>. <strong>Chiều cao <i>h</i> tuyệt đối
+                được bảo toàn hướng thẳng lên trên.</strong>
+        </div>
+
+        <h3>Bước 4.2: Chiến lược phân loại và sắp xếp thứ tự ưu tiên (Sorting Heuristic)</h3>
+        <p>Danh sách các kiện hàng yêu cầu được trải phẳng và sắp xếp theo nguyên lý:</p>
+        <div class="code-snippet">
+            <span class="code-title">app.py: Dòng 307</span>
+            sorted(range(num_items), key=lambda x: (flat_boxes[x]['is_fragile'], -flat_boxes[x]['vol']))
+        </div>
+        <ul>
+            <li><strong>Ưu tiên 1 (<code>is_fragile</code>):</strong> Hàng không dễ vỡ (<code>False = 0</code>) xếp
+                trước, hàng dễ vỡ (<code>True = 1</code>) xếp sau cùng. Đảm bảo các khối hàng vững chắc luôn nằm ở tầng
+                dưới đáy.</li>
+            <li><strong>Ưu tiên 2 (<code>-vol</code>):</strong> Áp dụng quy tắc <strong>First-Fit Decreasing
+                    (FFD)</strong> kinh điển: các kiện to cồng kềnh đưa vào xếp trước để định hình cấu trúc khoang chứa,
+                các kiện nhỏ xếp sau sẽ lấp đầy vào các khe hở còn thừa.</li>
+        </ul>
+
+        <h3>Bước 4.3: Tập điểm đặt tiềm năng Extreme Points & Thứ tự duyệt ưu tiên</h3>
+        <p>
+            Bắt đầu với điểm gốc duy nhất: <code>points = [(0.0, 0.0, 0.0)]</code>. Tại mỗi lượt duyệt thùng, tập điểm
+            được sắp xếp lại:
+        </p>
+        <div class="code-snippet">
+            <span class="code-title">app.py: Dòng 208</span>
+            points.sort(key=lambda p: (p[0], p[2], p[1]))
+        </div>
+        <p>
+            <strong>Quy tắc quét:</strong>
+            <span class="math-sym">X tăng dần</span> <span class="arrow-step">&rarr;</span>
+            <span class="math-sym">Z tăng dần</span> <span class="arrow-step">&rarr;</span>
+            <span class="math-sym">Y tăng dần</span>.<br>
+            <em>Ý nghĩa thực tiễn:</em> Xếp hàng sát từ đáy vách trong cùng ra cửa container (trục <i>X</i>), lấp đầy
+            toàn bộ bề ngang mặt sàn (trục <i>Z</i>), rồi mới bắt đầu xếp chồng tầng lên cao (trục <i>Y</i>). Kỹ thuật
+            này tạo nên các "bức tường hàng" (Wall-building) cực kỳ ổn định trong vận tải.
+        </p>
+
+        <h3>Bước 4.4: Cơ chế sinh 3 điểm Extreme Point mới</h3>
+        <p>Khi một kiện hàng được đặt thành công tại điểm <code>(px, py, pz)</code> với kích thước xoay
+            <code>(rl, rw, rh)</code>, điểm tựa cũ bị gỡ bỏ và 3 điểm tựa mới được kích hoạt:
+        </p>
+        <ol>
+            <li><code>P<sub>1</sub> = (px + rl, py, pz)</code>: Điểm tựa mặt trước theo chiều dài (đẩy tiếp về phía cửa
+                thùng).</li>
+            <li><code>P<sub>2</sub> = (px, py + rh, pz)</code>: Điểm tựa trên nóc kiện hàng (chồng tầng tiếp theo).</li>
+            <li><code>P<sub>3</sub> = (px, py, pz + rw)</code>: Điểm tựa mặt bên theo chiều ngang (xếp mở rộng sang vách
+                bên kia).</li>
+        </ol>
+
+        <!-- PHẦN 5 -->
+        <h2 id="phan5">5. Bộ 5 ràng buộc kỹ thuật công nghiệp nghiêm ngặt</h2>
+        <p>Để một vị trí đặt được phê duyệt, nó bắt buộc phải thỏa mãn đồng thời toàn bộ 5 điều kiện an toàn:</p>
+
+        <div class="grid-cards">
+            <div class="grid-card">
+                <h4>1. Ràng buộc biên lọt lòng (Boundary Limit)</h4>
+                <p>Kiện hàng không được vượt quá kích thước hiệu dụng của thùng:<br>
+                    <code>px + rl &le; eff_L + 0.001</code><br>
+                    <code>py + rh &le; eff_H + 0.001</code><br>
+                    <code>pz + rw &le; eff_W + 0.001</code>
+                </p>
+            </div>
+            <div class="grid-card">
+                <h4>2. Ràng buộc chống va chạm thể tích (Non-Overlap)</h4>
+                <p>Áp dụng định lý tách trục AABB. Kiểm tra kiện hàng mới không đè lấn hoặc xuyên thấu vào bất kỳ kiện
+                    hàng nào đã xếp trước đó trên cả 3 trục tọa độ.</p>
+            </div>
+            <div class="grid-card">
+                <h4>3. Ràng buộc nâng đỡ trọng lực (&ge; 75%)</h4>
+                <p>Nếu kiện hàng nằm ở tầng cao (<code>ny > 0</code>), tổng diện tích tiếp xúc với nóc các kiện hàng
+                    tầng dưới phải đạt <strong>tối thiểu 75%</strong> diện tích đáy. Tránh kiện hàng bị kê bấp bênh hoặc
+                    lơ lửng.</p>
+            </div>
+            <div class="grid-card">
+                <h4>4. Ràng buộc bảo vệ hàng dễ vỡ (Fragile Crush)</h4>
+                <p>Nếu kiện hàng đang xếp là hàng thường/nặng, thuật toán kiểm tra các kiện đỡ phía dưới. Nếu phát hiện
+                    nóc kiện đỡ là hàng có cờ <code>is_fragile = True</code> thì <strong>từ chối vị trí ngay lập
+                        tức</strong>.</p>
+            </div>
+            <div class="grid-card" style="grid-column: span 2;">
+                <h4>5. Ràng buộc tải trọng tối đa & Kích hoạt Pallet động (Dynamic Pallet Activation)</h4>
+                <p>
+                    Không tính trước tải trọng của tất cả pallet trên sàn. Khi một kiện hàng được xếp, thuật toán chiếu
+                    hình học đáy của nó xuống mặt sàn: pallet nào có giao cắt diện tích mà chưa được kích hoạt sẽ được
+                    đưa vào danh sách tính tải.<br>
+                    <strong>Điều kiện dừng:</strong>
+                    <code>Tổng khối lượng hàng + Tổng khối lượng pallet đã kích hoạt &le; Tải trọng tối đa của container</code>.
+                </p>
+            </div>
+        </div>
+
+        <!-- PHẦN 6 -->
+        <h2 id="phan6">6. Hiệu chỉnh tọa độ & Căn tâm trọng tải Container</h2>
+        <p>Sau khi hoàn tất quá trình xếp hàng trên lưới tọa độ toán học, hệ thống thực hiện bước hiệu chỉnh tọa độ thực
+            tế trước khi trả về dữ liệu:</p>
+        <ul>
+            <li>
+                <strong>Căn giữa theo phương ngang trục Z:</strong>
+                <div class="code-snippet">
+                    offset_Z = (cW - eff_W) / 2.0 if use_pallet else 0.0
+                </div>
+                Dịch chuyển toàn bộ kiện hàng và các tấm pallet vào chính giữa trục đối xứng của container. Điều này
+                giúp tọa độ trọng tâm ngang <b><i>Z</i><sub>CoG</sub></b> trùng khít với tâm container
+                (<code><i>Z</i><sub>CoG</sub> &equiv; cW / 2</code>), chừa đều khe hở 2 bên vách, chống hiện tượng lật
+                xe khi vào cua.
+            </li>
+            <li>
+                <strong>Nâng độ cao chân hàng theo trục Y:</strong>
+                Toàn bộ các thùng carton được cộng thêm độ dời <code>offset_Y = pH</code> (chiều cao pallet, thường là
+                0.15m), trong khi các tấm pallet nằm ở lớp sàn từ <code>0 &rarr; pH</code>.
+            </li>
+        </ul>
+
+        <!-- PHẦN 7 -->
+        <h2 id="phan7">7. Kiến trúc hiển thị Three.js, Mô phỏng & Xuất Excel</h2>
+        <ul>
+            <li>
+                <strong>Dựng hình chi tiết Pallet gỗ thật (Parametric 3D Pallet):</strong> Thay vì dùng một khối hộp đặc
+                đại diện, Three.js dựng tỉ mỉ từng chi tiết thực tế của một tấm pallet: 7 thanh ván mặt trên, 3 thanh
+                giằng dọc, 9 con kê chịu lực và 3 thanh liên kết đáy.
+            </li>
+            <li>
+                <strong>Ma trận quay & Nhãn "THIS SIDE UP":</strong> Dựa vào mã <code>rtype</code> (0 đến 5), hệ thống
+                áp ma trận xoay <code>Matrix4</code> tương ứng để các mặt dán nhãn cảnh báo mũi tên chỉ đúng chiều thực
+                tế sau khi bị lật/nghiêng.
+            </li>
+            <li>
+                <strong>Mô phỏng bốc xếp tuần tự (Simulation):</strong> Sử dụng bộ định thời (timer) để thả từng tấm
+                pallet sàn vào trước, sau đó lần lượt đưa từng kiện carton vào theo đúng trình tự từ đáy trong ra ngoài
+                cửa, hỗ trợ công nhân đóng hàng trực quan.
+            </li>
+            <li>
+                <strong>Báo cáo hiệu suất Excel (SheetJS):</strong> Tự động tổng hợp đầy đủ 4 phân khu nghiệp vụ: Thông
+                tin Container, Thông tin Pallet, Chi tiết kiện hàng (Đã xếp / Yêu cầu) và Đánh giá hiệu suất (% lấp đầy
+                thể tích, % tải trọng sử dụng).
+            </li>
+        </ul>
+
+    </div>
+
+</body>
+
+</html>

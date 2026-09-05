@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng 3D Sắp Xếp Có Lót Pallet Linh Hoạt</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="top-menu">
+        <div class="menu-item">📁 File</div>
+        <div class="menu-item" onclick="validateAndCalculate()">⚙️ Tính toán</div>
+        <div class="menu-item">👁️ Hiển thị</div>
+        <div class="menu-item" onclick="exportToExcel()">📊 Báo cáo</div>
+        <div class="menu-item">❓ Trợ giúp</div>
+    </div>
+
+    <div class="header-title">
+        <h2>CHƯƠNG TRÌNH MÔ PHỎNG SẮP XẾP CONTAINER 3D (HỖ TRỢ PALLET)</h2>
+    </div>
+
+    <div class="app-container" style="display: flex; height: calc(100vh - 85px); overflow: hidden;">
+        <div class="left-panel" style="width: 400px; background: #fff; padding: 15px; overflow-y: auto; border-right: 1px solid #ccc; flex-shrink: 0;">
+            <div class="panel-header" style="background: #0056b3; color: white; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 15px;">1. NHẬP THÔNG TIN</div>
+            
+            <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN CONTAINER</div>
+            <div class="input-section" style="margin-bottom: 15px;">
+                <select id="container-type" onchange="updateContainerSize()" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                    <option value="20ft">Loại: 20ft Standard</option>
+                    <option value="40ft">Loại: 40ft Standard</option>
+                    <option value="40hc" selected>Loại: 40'HC</option>
+                </select>
+                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Dài:</span> <span id="lbl-cL">12.032 m</span></div>
+                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Rộng:</span> <span id="lbl-cW">2.352 m</span></div>
+                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Cao:</span> <span id="lbl-cH">2.698 m</span></div>
+                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Tải trọng max:</span> <span id="lbl-cMaxW">28,000 kg</span></div>
+                
+                <input type="hidden" id="c-l" value="12.032">
+                <input type="hidden" id="c-w" value="2.352">
+                <input type="hidden" id="c-h" value="2.698">
+                <input type="hidden" id="c-maxw" value="28000">
+            </div>
+
+            <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN PALLET LÓT SÀN</div>
+            <div class="input-section" style="margin-bottom: 15px; background: #eef7ff; border: 1px solid #b8daff; padding: 10px; border-radius: 4px;">
+                <label style="font-weight: bold; color: #0056b3; display: flex; align-items: center; cursor: pointer; margin-bottom: 8px; font-size: 13px;">
+                    <input type="checkbox" id="use-pallet" checked onchange="togglePalletOptions()" style="margin-right: 8px;"> CÓ SỬ DỤNG PALLET
+                </label>
+                <div id="pallet-options">
+                    <select id="pallet-type" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid #ccc; border-radius: 3px;">
+                        <option value="asia" data-l="1.1" data-w="1.1" data-h="0.15" data-wg="15.0">Chuẩn Châu Á (1.1m x 1.1m x 0.15m - 15kg)</option>
+                        <option value="euro" data-l="1.2" data-w="0.8" data-h="0.15" data-wg="20.0">Chuẩn Châu Âu (1.2m x 0.8m x 0.15m - 20kg)</option>
+                    </select>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px; font-style: italic;"></div>
+                </div>
+            </div>
+            <script>
+                function togglePalletOptions() {
+                    const isUsed = document.getElementById('use-pallet').checked;
+                    document.getElementById('pallet-options').style.display = isUsed ? 'block' : 'none';
+                }
+            </script>
+
+            <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN CARTON</div>
+            <div class="input-section carton-section" id="carton-container"></div>
+
+            <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">TÙY CHỌN CHUNG</div>
+            <div class="input-section options-section" style="margin-bottom: 20px;">
+                <label style="font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>• Giới hạn chiều cao xếp:</span> 
+                    <span><input type="number" id="limit-h" value="2.6" step="0.1" style="width: 60px; text-align: right; padding: 4px;"> m</span>
+                </label>
+            </div>
+            
+            <button class="btn-primary" onclick="validateAndCalculate()" style="width: 100%; padding: 14px; background: #0056b3; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; text-transform: uppercase;">Tiến hành xếp hàng</button>
+            <div id="loading-txt" class="loading" style="display: none; color: red; text-align: center; margin-top: 10px; font-weight: bold; font-size: 13px;">Đang xử lý thuật toán tối ưu...</div>
+        </div>
+
+        <div class="center-panel" id="canvas-container" style="flex-grow: 1; position: relative; background: #e8eaed;">
+            <div class="floating-toolbar" style="position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div class="tb-title" style="font-size: 11px; font-weight: bold; color: #555; margin-bottom: 8px;">GÓC NHÌN</div>
+                <button class="icon-btn" title="Phối cảnh 3D" onclick="resetCamera()" style="background: white; border: 1px solid #ccc; padding: 6px; border-radius: 4px; cursor: pointer;">📦</button>
+            </div>
+
+            <div class="floating-result" style="position: absolute; top: 15px; right: 15px; width: 280px; max-height: 95vh; display: flex; flex-direction: column; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                <div class="tb-title" style="font-size: 13px; font-weight: bold; color: #333; margin-bottom: 10px; text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 8px;">BÁO CÁO NHANH</div>
+                
+                <div id="kpi-container" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;"></div>
+                
+                <div style="background: #eef7ff; border: 1px solid #b8daff; border-radius: 4px; padding: 8px; margin-bottom: 10px;">
+                    <div class="res-row" style="display: flex; justify-content: space-between; font-size: 13px; color: #004085; font-weight: bold;">
+                        <span>Pallet đã dùng:</span> <b id="kpi-pallet">0 tấm</b>
+                    </div>
+                    <div class="res-row" style="display: flex; justify-content: space-between; font-size: 12px; color: #004085; margin-top: 4px;">
+                        <span>Khối lượng Pallet:</span> <b id="kpi-pallet-weight">0 kg</b>
+                    </div>
+                </div>
+                
+                <div class="res-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-top: 5px;"><span>Tổng thể tích (Hàng + Pallet):</span> <b id="kpi-vol">0 m³</b></div>
+                <div class="res-row" style="display: flex; justify-content: space-between; font-size: 13px; color: #888;"><span>→ Thể tích rỗng:</span> <b id="kpi-vol-free">0 m³</b></div>
+
+                <div class="res-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 5px;"><span>Tổng tải (Hàng + Pallet):</span> <b id="kpi-weight">0 kg</b></div>
+                <div class="res-row" style="display: flex; justify-content: space-between; font-size: 13px; color: #888;"><span>→ Tải trọng dư:</span> <b id="kpi-weight-free">0 kg</b></div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; text-align: center;">
+                    <div class="res-big" style="font-size: 12px; font-weight: bold; color: #555;">
+                        Lấp đầy Thể tích<br>
+                        <span id="kpi-fill" class="highlight-blue" style="font-size: 20px; font-weight: bold; color: #0056b3;">0.0%</span>
+                    </div>
+                    <div class="res-big" style="font-size: 12px; font-weight: bold; color: #555;">
+                        Lấp đầy Tải trọng<br>
+                        <span id="kpi-weight-fill" class="highlight-orange" style="font-size: 20px; font-weight: bold; color: #e65c00;">0.0%</span>
+                    </div>
+                </div>
+
+                <div class="tb-title" style="font-size: 12px; font-weight: bold; color: #333; margin-top: 15px; margin-bottom: 10px;">CHÚ THÍCH HIỂN THỊ</div>
+                <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 5px; font-size: 13px;">
+                    <span class="box-color" style="background: #cd853f; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 3px;"></span> Pallet lót sàn
+                </div>
+                <div id="legend-container" style="max-height: 100px; overflow-y: auto; font-size: 13px;"></div>
+
+                <button class="btn-primary" id="btn-sim" style="display: none; width: 100%; margin-top: 15px; flex-shrink: 0; padding: 12px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px;" onclick="runSimulation()">▶ CHẠY MÔ PHỎNG</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

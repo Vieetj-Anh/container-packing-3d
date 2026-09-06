@@ -1,5 +1,5 @@
 ﻿import math
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +12,12 @@ app.add_middleware(
     allow_methods=["*"], 
     allow_headers=["*"]
 )
+
+@app.middleware("http")
+async def debug_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Debug-Path"] = request.scope.get("path", "none")
+    return response
 
 class BoxItem(BaseModel):
     id: str
@@ -347,4 +353,21 @@ def run_packing(req: PackRequest):
         "total_vol_pallets": best_vol_pallets,
         "total_weight": best_weight,
         "container_vol": req.cL * req.cW * req.cH
+    }
+@app.api_route("/{full_path:path}", methods=["GET", "POST"])
+async def debug_catch_all(request: Request, full_path: str = ""):
+    if request.method == "POST":
+        try:
+            body = await request.json()
+            req = PackRequest(**body)
+            return run_packing(req)
+        except Exception as e:
+            return {"error": str(e), "path_received": request.scope.get("path"), "full_path": full_path}
+    return {
+        "status": "ok",
+        "debug_info": {
+            "path_received": request.scope.get("path"),
+            "full_path": full_path,
+            "url": str(request.url)
+        }
     }

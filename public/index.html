@@ -28,24 +28,35 @@
         <div class="left-panel" style="width: 400px; background: #fff; padding: 15px; overflow-y: auto; border-right: 1px solid #ccc; flex-shrink: 0;">
             <div class="panel-header" style="background: #0056b3; color: white; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 15px;">1. NHẬP THÔNG TIN</div>
             
+            <!-- THÔNG TIN CONTAINER -->
             <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN CONTAINER</div>
             <div class="input-section" style="margin-bottom: 15px;">
-                <select id="container-type" onchange="updateContainerSize()" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                <select id="container-type" onchange="updateContainerSize()" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc;">
                     <option value="20ft">Loại: 20ft Standard</option>
                     <option value="40ft">Loại: 40ft Standard</option>
                     <option value="40hc" selected>Loại: 40'HC</option>
+                    <option value="custom">🛠️ Tùy chỉnh kích thước riêng</option>
                 </select>
-                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Dài:</span> <span id="lbl-cL">12.032 m</span></div>
-                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Rộng:</span> <span id="lbl-cW">2.352 m</span></div>
-                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Cao:</span> <span id="lbl-cH">2.698 m</span></div>
-                <div class="info-row" style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;"><span>• Tải trọng max:</span> <span id="lbl-cMaxW">28,000 kg</span></div>
                 
-                <input type="hidden" id="c-l" value="12.032">
-                <input type="hidden" id="c-w" value="2.352">
-                <input type="hidden" id="c-h" value="2.698">
-                <input type="hidden" id="c-maxw" value="28000">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                    <label>• Dài (m):</label>
+                    <input type="number" id="c-l" value="12.032" step="0.001" readonly style="width: 120px; padding: 4px; text-align: right; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                    <label>• Rộng (m):</label>
+                    <input type="number" id="c-w" value="2.352" step="0.001" readonly style="width: 120px; padding: 4px; text-align: right; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                    <label>• Cao (m):</label>
+                    <input type="number" id="c-h" value="2.698" step="0.001" readonly style="width: 120px; padding: 4px; text-align: right; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                    <label>• Tải trọng max (kg):</label>
+                    <input type="number" id="c-maxw" value="28000" readonly style="width: 120px; padding: 4px; text-align: right; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
             </div>
 
+            <!-- THÔNG TIN PALLET -->
             <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN PALLET LÓT SÀN</div>
             <div class="input-section" style="margin-bottom: 15px; background: #eef7ff; border: 1px solid #b8daff; padding: 10px; border-radius: 4px;">
                 <label style="font-weight: bold; color: #0056b3; display: flex; align-items: center; cursor: pointer; margin-bottom: 8px; font-size: 13px;">
@@ -56,19 +67,124 @@
                         <option value="asia" data-l="1.1" data-w="1.1" data-h="0.15" data-wg="15.0">Chuẩn Châu Á (1.1m x 1.1m x 0.15m - 15kg)</option>
                         <option value="euro" data-l="1.2" data-w="0.8" data-h="0.15" data-wg="20.0">Chuẩn Châu Âu (1.2m x 0.8m x 0.15m - 20kg)</option>
                     </select>
-                    <div style="font-size: 11px; color: #666; margin-top: 5px; font-style: italic;"></div>
+                    <div style="font-size: 11px; color: #666; margin-top: 5px; font-style: italic;">* Hệ thống tự động tính toán xoay hướng Pallet để tối ưu hóa diện tích mặt sàn.</div>
                 </div>
             </div>
-            <script>
-                function togglePalletOptions() {
-                    const isUsed = document.getElementById('use-pallet').checked;
-                    document.getElementById('pallet-options').style.display = isUsed ? 'block' : 'none';
-                }
-            </script>
 
-            <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN CARTON</div>
-            <div class="input-section carton-section" id="carton-container"></div>
+            <!-- THÔNG TIN CARTON -->
+            <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">THÔNG TIN CARTON / KIỆN HÀNG</div>
+            <div class="input-section carton-section" id="carton-container">
+                
+                <!-- HÀNG LOẠI A -->
+                <div class="carton-item" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: bold; color: #0056b3; font-size: 13px;">
+                            <input type="checkbox" id="use-A" checked> Loại A (Xanh dương)
+                        </label>
+                        <div style="font-size: 12px;">
+                            <label><input type="checkbox" id="fragile-A"> Dễ vỡ</label>
+                            <label style="margin-left: 10px;"><input type="checkbox" id="flip-A" checked> Cho xoay</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Lựa chọn hình dáng -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; background: #f9f9f9; padding: 5px; border-radius: 4px;">
+                        <div style="width: 48%;">
+                            <label style="display: block; margin-bottom: 3px;">Hình dáng:</label>
+                            <select id="shape-A" onchange="toggleShape('A')" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                                <option value="box">Hình hộp</option>
+                                <option value="cylinder">Hình trụ</option>
+                            </select>
+                        </div>
+                        <div style="width: 48%; display: none;" id="radius-container-A">
+                            <label style="display: block; margin-bottom: 3px; color: #e65c00;">Bán kính (m):</label>
+                            <input type="number" id="radius-A" value="0.2" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
 
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">
+                        <div style="width: 30%;" id="l-container-A">
+                            <label style="display: block; margin-bottom: 3px;">Dài (m):</label>
+                            <input type="number" id="l-A" value="0.6" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="width: 30%;" id="w-container-A">
+                            <label style="display: block; margin-bottom: 3px;">Rộng (m):</label>
+                            <input type="number" id="w-A" value="0.4" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="width: 30%;">
+                            <label style="display: block; margin-bottom: 3px;">Cao (m):</label>
+                            <input type="number" id="h-A" value="0.4" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <div style="width: 48%;">
+                            <label style="display: block; margin-bottom: 3px;">Nặng (kg/kiện):</label>
+                            <input type="number" id="weight-A" value="15" step="0.1" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="width: 48%;">
+                            <label style="display: block; margin-bottom: 3px; font-weight: bold;">Số lượng:</label>
+                            <input type="number" id="qty-A" value="180" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <input type="hidden" id="color-A" value="#3182ce">
+                </div>
+
+                <!-- HÀNG LOẠI B -->
+                <div class="carton-item" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: bold; color: #e65c00; font-size: 13px;">
+                            <input type="checkbox" id="use-B" checked> Loại B (Cam)
+                        </label>
+                        <div style="font-size: 12px;">
+                            <label><input type="checkbox" id="fragile-B"> Dễ vỡ</label>
+                            <label style="margin-left: 10px;"><input type="checkbox" id="flip-B" checked> Cho xoay</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Lựa chọn hình dáng -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; background: #f9f9f9; padding: 5px; border-radius: 4px;">
+                        <div style="width: 48%;">
+                            <label style="display: block; margin-bottom: 3px;">Hình dáng:</label>
+                            <select id="shape-B" onchange="toggleShape('B')" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                                <option value="box">Hình hộp</option>
+                                <option value="cylinder">Hình trụ</option>
+                            </select>
+                        </div>
+                        <div style="width: 48%; display: none;" id="radius-container-B">
+                            <label style="display: block; margin-bottom: 3px; color: #e65c00;">Bán kính (m):</label>
+                            <input type="number" id="radius-B" value="0.2" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px;">
+                        <div style="width: 30%;" id="l-container-B">
+                            <label style="display: block; margin-bottom: 3px;">Dài (m):</label>
+                            <input type="number" id="l-B" value="0.3" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="width: 30%;" id="w-container-B">
+                            <label style="display: block; margin-bottom: 3px;">Rộng (m):</label>
+                            <input type="number" id="w-B" value="0.2" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="width: 30%;">
+                            <label style="display: block; margin-bottom: 3px;">Cao (m):</label>
+                            <input type="number" id="h-B" value="0.2" step="0.01" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <div style="width: 48%;">
+                            <label style="display: block; margin-bottom: 3px;">Nặng (kg/kiện):</label>
+                            <input type="number" id="weight-B" value="5" step="0.1" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="width: 48%;">
+                            <label style="display: block; margin-bottom: 3px; font-weight: bold;">Số lượng:</label>
+                            <input type="number" id="qty-B" value="100" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <input type="hidden" id="color-B" value="#e65c00">
+                </div>
+            </div>
+
+            <!-- TÙY CHỌN CHUNG -->
             <div class="section-title" style="font-weight: bold; color: #555; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">TÙY CHỌN CHUNG</div>
             <div class="input-section options-section" style="margin-bottom: 20px;">
                 <label style="font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
@@ -128,6 +244,41 @@
             </div>
         </div>
     </div>
+
+    <!-- SCRIPT XỬ LÝ ẨN/HIỆN GIAO DIỆN -->
+    <script>
+        function togglePalletOptions() {
+            const isUsed = document.getElementById('use-pallet').checked;
+            document.getElementById('pallet-options').style.display = isUsed ? 'block' : 'none';
+        }
+
+        // Hàm tự động ẩn/hiện ô Dài, Rộng và Bán kính tùy theo Hình dáng được chọn
+        function toggleShape(id) {
+            const shape = document.getElementById(`shape-${id}`).value;
+            const radiusContainer = document.getElementById(`radius-container-${id}`);
+            const lContainer = document.getElementById(`l-container-${id}`);
+            const wContainer = document.getElementById(`w-container-${id}`);
+            const flipCheckbox = document.getElementById(`flip-${id}`);
+
+            if (shape === 'cylinder') {
+                radiusContainer.style.display = 'block';
+                lContainer.style.display = 'none';
+                wContainer.style.display = 'none';
+                
+                // Khóa chế độ lật ngang (Hình trụ thường xếp đứng)
+                flipCheckbox.checked = false;
+                flipCheckbox.disabled = true;
+            } else {
+                radiusContainer.style.display = 'none';
+                lContainer.style.display = 'block';
+                wContainer.style.display = 'block';
+                
+                // Mở lại chế độ cho lật ngang
+                flipCheckbox.disabled = false;
+                flipCheckbox.checked = true;
+            }
+        }
+    </script>
 
     <script src="main.js"></script>
 </body>

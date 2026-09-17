@@ -1,4 +1,4 @@
-﻿import math
+import math
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,15 +19,18 @@ async def debug_headers(request: Request, call_next):
     response.headers["X-Debug-Path"] = request.scope.get("path", "none")
     return response
 
+
 class BoxItem(BaseModel):
     id: str
     color: str
-    l: float
-    w: float
+    shape: str = "box"
+    radius: float = 0.0
+    l: float = 0.0
+    w: float = 0.0
     h: float
     weight: float
     qty: int
-    allow_flip: bool
+    allow_flip: bool = True
     is_fragile: bool = False
 
 class PalletInfo(BaseModel):
@@ -77,7 +80,8 @@ def check_overlap_fast(nx, ny, nz, nl, nw, nh, placed_tuples):
             return True
     return False
 
-def check_support_fast(nx, ny, nz, nl, nw, nh, placed_tuples, threshold=0.75):
+# CẬP NHẬT 1: Hạ ngưỡng hỗ trợ diện tích (threshold) xuống 0.6 để thuật toán "tự tin" xếp chồng hơn
+def check_support_fast(nx, ny, nz, nl, nw, nh, placed_tuples, threshold=0.6):
     if ny <= 0.001:
         return True
     
@@ -110,10 +114,6 @@ def check_fragile_crush(px, py, pz, rl, rw, rh, is_fragile, placed_boxes):
     return False
 
 def generate_optimal_pallet_layout(cL, cW, pL, pW):
-    """
-    Tá»± Ä‘á»™ng tÃ­nh toÃ¡n phÃ¢n tÃ­ch sÆ¡ Ä‘á»“ bá»‘ trÃ­ lÆ°á»›i Pallet nÃ¢ng cao.
-    Há»— trá»£ chia há»—n há»£p cáº£ theo TRá»¤C Dá»ŒC (X) láº«n TRá»¤C NGANG SÃT VÃCH (Z) Ä‘á»ƒ tá»‘i Æ°u tá»‘i Ä‘a bá» rá»™ng lÃ²ng thÃ¹ng.
-    """
     best_pallets = []
     max_count = -1
     best_area = -1
@@ -127,20 +127,14 @@ def generate_optimal_pallet_layout(cL, cW, pL, pW):
             best_area = area
             best_pallets = current_pallets
 
-    # TÃ­nh toÃ¡n sá»‘ lÆ°á»£ng hÃ ng/cá»™t cÆ¡ sá»Ÿ cho 2 tráº¡ng thÃ¡i xoay
     cols1 = int((cL + 0.001) // pL)
     rows1 = int((cW + 0.001) // pW)
-    
     cols2 = int((cL + 0.001) // pW)
     rows2 = int((cW + 0.001) // pL)
 
-    # PhÆ°Æ¡ng Ã¡n 1: ToÃ n bá»™ Ä‘áº·t dá»c theo chiá»u dÃ i container
     update_best([{'x': i * pL, 'z': j * pW, 'l': pL, 'w': pW} for i in range(cols1) for j in range(rows1)])
-
-    # PhÆ°Æ¡ng Ã¡n 2: ToÃ n bá»™ Ä‘áº·t ngang xoay 90 Ä‘á»™
     update_best([{'x': i * pW, 'z': j * pL, 'l': pW, 'w': pL} for i in range(cols2) for j in range(rows2)])
 
-    # PhÆ°Æ¡ng Ã¡n 3: Há»—n há»£p chia theo TRá»¤C Dá»ŒC X (Khá»‘i Ä‘áº§u xáº¿p Dá»c, KhÃ´ng gian thá»«a phÃ­a sau xoay Ngang)
     for c_A in range(1, cols1 + 1):
         x_split = c_A * pL
         rem_L = cL - x_split
@@ -151,7 +145,6 @@ def generate_optimal_pallet_layout(cL, cW, pL, pW):
             p_mix += [{'x': x_split + i * pW, 'z': j * pL, 'l': pW, 'w': pL} for i in range(c_B) for j in range(r_B)]
             update_best(p_mix)
 
-    # PhÆ°Æ¡ng Ã¡n 4: Há»—n há»£p chia theo TRá»¤C Dá»ŒC X (Khá»‘i Ä‘áº§u xáº¿p Ngang, KhÃ´ng gian thá»«a phÃ­a sau xoay Dá»c)
     for c_A in range(1, cols2 + 1):
         x_split = c_A * pW
         rem_L = cL - x_split
@@ -162,7 +155,6 @@ def generate_optimal_pallet_layout(cL, cW, pL, pW):
             p_mix += [{'x': x_split + i * pL, 'z': j * pW, 'l': pL, 'w': pW} for i in range(c_B) for j in range(r_B)]
             update_best(p_mix)
 
-    # Má»šI - PhÆ°Æ¡ng Ã¡n 5: Há»—n há»£p chia theo TRá»¤C NGANG Z (DÃ£y bÃªn trÃ¡i xáº¿p Dá»c Ã¡p sÃ¡t vÃ¡ch, DÃ£y bÃªn pháº£i xoay Ngang)
     for r_A in range(1, rows1 + 1):
         z_split = r_A * pW
         rem_W = cW - z_split
@@ -173,7 +165,6 @@ def generate_optimal_pallet_layout(cL, cW, pL, pW):
             p_mix += [{'x': i * pW, 'z': z_split + j * pL, 'l': pW, 'w': pL} for i in range(c_B) for j in range(r_B)]
             update_best(p_mix)
 
-    # Má»šI - PhÆ°Æ¡ng Ã¡n 6: Há»—n há»£p chia theo TRá»¤C NGANG Z (DÃ£y bÃªn trÃ¡i xáº¿p Ngang Ã¡p sÃ¡t vÃ¡ch, DÃ£y bÃªn pháº£i xoay Dá»c)
     for r_A in range(1, rows2 + 1):
         z_split = r_A * pL
         rem_W = cW - z_split
@@ -211,17 +202,24 @@ def pack_with_pallet_floor(sequence, flat_boxes, cL, cW, cH, maxW, pL, pW, pH, p
         if total_w + box['weight'] > maxW: continue 
         if not points: break
 
-        points.sort(key=lambda p: (p[0], p[2], p[1]))
+        # CẬP NHẬT 2: Sắp xếp điểm đặt chặt chẽ (Tight-Packing) 
+        # Loại bỏ sai số thập phân bằng round() và ưu tiên X -> Z -> Y để dựng trọn vẹn từng cột.
+        points.sort(key=lambda p: (round(p[0], 3), round(p[2], 3), round(p[1], 3)))
+        
         best_pt, best_rot, best_new_pallets = None, None, set()
 
         for pt in points:
             px, py, pz = pt
-            for rot in box['rotations']:
+            
+            box_rotations = sorted(box['rotations'], key=lambda r: -(r[0] * r[1]))
+            
+            for rot in box_rotations:
                 rl, rw, rh, rtype = rot
                 
                 if px + rl <= eff_L + 0.001 and py + rh <= eff_H + 0.001 and pz + rw <= eff_W + 0.001:
                     if not check_overlap_fast(px, py, pz, rl, rw, rh, placed_tuples):
-                        if check_support_fast(px, py, pz, rl, rw, rh, placed_tuples, threshold=0.75):
+                        # Đã đồng bộ threshold=0.6 ở đây
+                        if check_support_fast(px, py, pz, rl, rw, rh, placed_tuples, threshold=0.6):
                             if not check_fragile_crush(px, py, pz, rl, rw, rh, box['is_fragile'], placed_boxes):
                                 
                                 if use_pallet:
@@ -247,8 +245,11 @@ def pack_with_pallet_floor(sequence, flat_boxes, cL, cW, cH, maxW, pL, pW, pH, p
             rl, rw, rh, rtype = best_rot
             
             placed_tuples.append((px, py, pz, rl, rw, rh))
+            
             placed_boxes.append({
-                "id": box['id'], "color": box['color'], "x": px, "y": py, "z": pz, "l": rl, "w": rw, "h": rh,
+                "id": box['id'], "color": box['color'], 
+                "shape": box['shape'], "radius": box['radius'],
+                "x": px, "y": py, "z": pz, "l": rl, "w": rw, "h": rh,
                 "orig_l": box['orig_l'], "orig_w": box['orig_w'], "orig_h": box['orig_h'],
                 "rtype": rtype, "weight": box['weight'], "is_fragile": box['is_fragile']
             })
@@ -261,9 +262,11 @@ def pack_with_pallet_floor(sequence, flat_boxes, cL, cW, cH, maxW, pL, pW, pH, p
 
             points.remove(best_pt)
             new_points = []
+            
             if px + rl < eff_L: new_points.append((px + rl, py, pz))
             if py + rh < eff_H: new_points.append((px, py + rh, pz))
             if pz + rw < eff_W: new_points.append((px, py, pz + rw))
+            
             points.extend(new_points)
             points = list(set(points)) 
 
@@ -297,26 +300,49 @@ def health_check():
 @app.post("/api/pack")
 @app.post("/pack")
 def run_packing(req: PackRequest):
-    print(f"\n[SERVER] ÄÃƒ KÃCH HOáº T THUáº¬T TOÃN Tá»I Æ¯U Há»–N Há»¢P THEO CHIá»€U Rá»˜NG SÃT VÃCH (Z-AXIS)!")
+    print("[SERVER] DA KICH HOAT THUAT TOAN TOI UU HON HOP BE MAT & DA CHIEN LUOC!")
     
     flat_boxes = []
     for item in req.boxItems:
-        rots = get_rotations(item.l, item.w, item.h, item.allow_flip)
+        actual_l = item.l
+        actual_w = item.w
+        actual_allow_flip = item.allow_flip
+        
+        if item.shape == "cylinder":
+            actual_l = item.radius * 2
+            actual_w = item.radius * 2
+            actual_allow_flip = False 
+            
+        rots = get_rotations(actual_l, actual_w, item.h, actual_allow_flip)
+        
         for _ in range(item.qty):
             flat_boxes.append({
                 "id": item.id, "color": item.color, "weight": item.weight,
+                "shape": item.shape,        
+                "radius": item.radius,      
                 "rotations": rots, 
-                "orig_l": item.l, "orig_w": item.w, "orig_h": item.h,
-                "vol": item.l * item.w * item.h,
+                "orig_l": actual_l, "orig_w": actual_w, "orig_h": item.h,
+                "vol": actual_l * actual_w * item.h,
+                "base_area": actual_l * actual_w,
                 "is_fragile": item.is_fragile
             })
 
     num_items = len(flat_boxes)
     if num_items == 0: 
-        return {"boxes": [], "pallets": [], "message": "KhÃ´ng cÃ³ hÃ ng"}
+        return {"boxes": [], "pallets": [], "message": "Không có hàng"}
 
     strategies = [
-        sorted(range(num_items), key=lambda x: (flat_boxes[x]['is_fragile'], -flat_boxes[x]['vol']))
+        sorted(range(num_items), key=lambda x: (flat_boxes[x]['is_fragile'], -flat_boxes[x]['vol'])),
+        sorted(range(num_items), key=lambda x: (flat_boxes[x]['is_fragile'], -flat_boxes[x]['orig_h'], -flat_boxes[x]['base_area'])),
+        sorted(range(num_items), key=lambda x: (flat_boxes[x]['is_fragile'], -flat_boxes[x]['base_area'], -flat_boxes[x]['orig_h'])),
+        sorted(range(num_items), key=lambda x: (flat_boxes[x]['is_fragile'], -max(flat_boxes[x]['orig_l'], flat_boxes[x]['orig_w']), -flat_boxes[x]['vol'])),
+        sorted(range(num_items), key=lambda x: (
+            flat_boxes[x]['is_fragile'], 
+            -flat_boxes[x]['orig_h'], 
+            -flat_boxes[x]['orig_l'], 
+            -flat_boxes[x]['orig_w'],
+            -flat_boxes[x]['weight']
+        ))
     ]
 
     best_solution = []
@@ -336,14 +362,14 @@ def run_packing(req: PackRequest):
             pL, pW, pH, pWeight, req.use_pallet
         )
         
-        if v_box > best_vol_boxes:
+        if len(placed) > len(best_solution) or (len(placed) == len(best_solution) and v_box > best_vol_boxes):
             best_vol_boxes = v_box
             best_vol_pallets = v_pal
             best_weight = weight
             best_solution = placed
             best_pallets = pallets
 
-    print(f"[SERVER] ÄÃ£ quÃ©t qua cáº¥u hÃ¬nh trá»¥c ngang. Xáº¿p Ä‘Æ°á»£c {len(best_solution)}/{num_items} thÃ¹ng. Tá»•ng sá»‘ pallet lÃ³t sÃ n: {len(best_pallets)}.")
+    print(f"[SERVER] Hoan thanh toi uu voi {len(strategies)} chien luoc. Xep duoc {len(best_solution)}/{num_items} thung. Pallet: {len(best_pallets)}.")
     
     return {
         "boxes": best_solution,
@@ -354,6 +380,7 @@ def run_packing(req: PackRequest):
         "total_weight": best_weight,
         "container_vol": req.cL * req.cW * req.cH
     }
+
 @app.api_route("/{full_path:path}", methods=["GET", "POST"])
 async def debug_catch_all(request: Request, full_path: str = ""):
     if request.method == "POST":

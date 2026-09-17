@@ -1,18 +1,32 @@
-// Cấu hình 10 loại thùng hàng
+// ==========================================
+// 1. CẤU HÌNH 20 LOẠI THÙNG HÀNG (A - T)
+// ==========================================
 const BOX_TYPES = [
     { id: 'A', name: 'Loại A (Xanh dương)', color: '#0056b3', l: 0.6, w: 0.4, h: 0.4, wg: 15, q: 180, checked: true },
     { id: 'B', name: 'Loại B (Cam)', color: '#e65c00', l: 0.3, w: 0.2, h: 0.2, wg: 5, q: 100, checked: true },
     { id: 'C', name: 'Loại C (Xanh lá)', color: '#28a745', l: 0.4, w: 0.3, h: 0.3, wg: 10, q: 50, checked: true },
-    { id: 'D', name: 'Loại D (Đỏ)', color: '#dc3545', l: 0.5, w: 0.4, h: 0.3, wg: 12, q: 0, checked: false },
-    { id: 'E', name: 'Loại E (Tím)', color: '#6f42c1', l: 0.4, w: 0.4, h: 0.4, wg: 10, q: 0, checked: false },
-    { id: 'F', name: 'Loại F (Xanh ngọc)', color: '#17a2b8', l: 0.3, w: 0.3, h: 0.3, wg: 8, q: 0, checked: false },
-    { id: 'G', name: 'Loại G (Vàng)', color: '#ffc107', l: 0.5, w: 0.5, h: 0.5, wg: 20, q: 0, checked: false },
-    { id: 'H', name: 'Loại H (Xanh lam)', color: '#20c997', l: 0.6, w: 0.3, h: 0.3, wg: 14, q: 0, checked: false },
-    { id: 'I', name: 'Loại I (Nâu)', color: '#795548', l: 0.7, w: 0.4, h: 0.4, wg: 18, q: 0, checked: false },
-    { id: 'J', name: 'Loại J (Hồng)', color: '#e83e8c', l: 0.2, w: 0.2, h: 0.2, wg: 2, q: 0, checked: false }
+    { id: 'D', name: 'Loại D (Đỏ)', color: '#dc3545', l: 0.5, w: 0.4, h: 0.3, wg: 12, q: 40, checked: true },
+    { id: 'E', name: 'Loại E (Tím)', color: '#6f42c1', l: 0.4, w: 0.4, h: 0.4, wg: 10, q: 30, checked: true },
+    { id: 'F', name: 'Loại F (Xanh ngọc)', color: '#17a2b8', l: 0.3, w: 0.3, h: 0.3, wg: 8, q: 60, checked: true },
+    { id: 'G', name: 'Loại G (Vàng)', color: '#ffc107', l: 0.5, w: 0.5, h: 0.5, wg: 20, q: 20, checked: true },
+    { id: 'H', name: 'Loại H (Xanh lam đậm)', color: '#20c997', l: 0.6, w: 0.3, h: 0.3, wg: 14, q: 35, checked: true },
+    { id: 'I', name: 'Loại I (Nâu)', color: '#795548', l: 0.7, w: 0.4, h: 0.4, wg: 18, q: 15, checked: true },
+    { id: 'J', name: 'Loại J (Hồng)', color: '#e83e8c', l: 0.2, w: 0.2, h: 0.2, wg: 2, q: 90, checked: true },
+    { id: 'K', name: 'Loại K (Xám)', color: '#6c757d', l: 0.45, w: 0.35, h: 0.35, wg: 11, q: 0, checked: false },
+    { id: 'L', name: 'Loại L (Xanh lá mạ)', color: '#85e085', l: 0.25, w: 0.25, h: 0.25, wg: 4, q: 0, checked: false },
+    { id: 'M', name: 'Loại M (Đỏ sậm)', color: '#a71d2a', l: 0.55, w: 0.45, h: 0.35, wg: 16, q: 0, checked: false },
+    { id: 'N', name: 'Loại N (Vàng đồng)', color: '#d4af37', l: 0.65, w: 0.35, h: 0.35, wg: 15, q: 0, checked: false },
+    { id: 'O', name: 'Loại O (Xanh dương nhạt)', color: '#4da6ff', l: 0.35, w: 0.25, h: 0.25, wg: 6, q: 0, checked: false },
+    { id: 'P', name: 'Loại P (Tím mận)', color: '#5b2c6f', l: 0.5, w: 0.3, h: 0.3, wg: 13, q: 0, checked: false },
+    { id: 'Q', name: 'Loại Q (Cam đất)', color: '#d35400', l: 0.4, w: 0.3, h: 0.4, wg: 11, q: 0, checked: false },
+    { id: 'R', name: 'Loại R (Xanh rêu)', color: '#1e8449', l: 0.45, w: 0.4, h: 0.3, wg: 12, q: 0, checked: false },
+    { id: 'S', name: 'Loại S (Hồng đậm)', color: '#c0392b', l: 0.3, w: 0.3, h: 0.2, wg: 5, q: 0, checked: false },
+    { id: 'T', name: 'Loại T (Xanh cổ vịt)', color: '#117a65', l: 0.8, w: 0.5, h: 0.5, wg: 25, q: 0, checked: false }
 ];
 
-// Khởi tạo HTML tự động cho Panel bên trái
+// ==========================================
+// 2. KHỞI TẠO GIAO DIỆN
+// ==========================================
 function initUI() {
     const cartonContainer = document.getElementById('carton-container');
     const kpiContainer = document.getElementById('kpi-container');
@@ -52,7 +66,9 @@ function initUI() {
 
 initUI();
 
-// THREE.JS BIẾN TOÀN CỤC
+// ==========================================
+// 3. THREE.JS & XỬ LÝ KHÔNG GIAN 3D
+// ==========================================
 let scene, camera, renderer, controls, cargoGroup, containerFrame;
 let computedBoxes = []; 
 let computedPallets = [];
@@ -106,27 +122,61 @@ function resetCamera() {
     controls.update();
 }
 
+// ==========================================
+// 4. QUẢN LÝ KÍCH THƯỚC CONTAINER (HỖ TRỢ TÙY CHỈNH)
+// ==========================================
 function getContainerDims() {
     const type = document.getElementById('container-type').value;
+    
+    if (type === 'custom') {
+        return {
+            l: parseFloat(document.getElementById('c-l').value) || 6.0,
+            w: parseFloat(document.getElementById('c-w').value) || 2.4,
+            h: parseFloat(document.getElementById('c-h').value) || 2.6,
+            maxW: parseFloat(document.getElementById('c-maxw').value) || 30000
+        };
+    }
+    
     if (type === '20ft') return { l: 5.90, w: 2.35, h: 2.39, maxW: 28000 };
     if (type === '40ft') return { l: 12.03, w: 2.35, h: 2.39, maxW: 27000 };
-    return { l: 12.032, w: 2.352, h: 2.698, maxW: 28000 }; 
+    return { l: 12.032, w: 2.352, h: 2.698, maxW: 28000 }; // 40'HC
 }
 
 function updateContainerSize() {
+    const type = document.getElementById('container-type').value;
+    const lInput = document.getElementById('c-l');
+    const wInput = document.getElementById('c-w');
+    const hInput = document.getElementById('c-h');
+    const maxWInput = document.getElementById('c-maxw');
+
+    if (type === 'custom') {
+        lInput.readOnly = false;
+        wInput.readOnly = false;
+        hInput.readOnly = false;
+        maxWInput.readOnly = false;
+
+        drawContainer(parseFloat(lInput.value) || 6.0, parseFloat(wInput.value) || 2.4, parseFloat(hInput.value) || 2.6);
+        return;
+    }
+
+    lInput.readOnly = true;
+    wInput.readOnly = true;
+    hInput.readOnly = true;
+    maxWInput.readOnly = true;
+
     const dims = getContainerDims();
     const limitH = parseFloat(document.getElementById('limit-h').value) || dims.h;
     const finalH = Math.min(dims.h, limitH);
 
-    document.getElementById('c-l').value = dims.l;
-    document.getElementById('c-w').value = dims.w;
-    document.getElementById('c-h').value = finalH;
-    document.getElementById('c-maxw').value = dims.maxW;
+    lInput.value = dims.l;
+    wInput.value = dims.w;
+    hInput.value = finalH;
+    maxWInput.value = dims.maxW;
 
-    document.getElementById('lbl-cL').innerText = dims.l.toFixed(3) + " m";
-    document.getElementById('lbl-cW').innerText = dims.w.toFixed(3) + " m";
-    document.getElementById('lbl-cH').innerText = dims.h.toFixed(3) + " m";
-    document.getElementById('lbl-cMaxW').innerText = dims.maxW.toLocaleString() + " kg";
+    if(document.getElementById('lbl-cL')) document.getElementById('lbl-cL').innerText = dims.l.toFixed(3) + " m";
+    if(document.getElementById('lbl-cW')) document.getElementById('lbl-cW').innerText = dims.w.toFixed(3) + " m";
+    if(document.getElementById('lbl-cH')) document.getElementById('lbl-cH').innerText = dims.h.toFixed(3) + " m";
+    if(document.getElementById('lbl-cMaxW')) document.getElementById('lbl-cMaxW').innerText = dims.maxW.toLocaleString() + " kg";
 
     drawContainer(dims.l, dims.w, finalH);
 }
@@ -219,6 +269,9 @@ function getCachedArrowMaterial(colorHex) {
     return materialCache[colorHex];
 }
 
+// ==========================================
+// 5. TÍNH TOÁN & XỬ LÝ DỮ LIỆU
+// ==========================================
 async function validateAndCalculate() {
     updateContainerSize(); 
     const cL = parseFloat(document.getElementById('c-l').value);
@@ -287,7 +340,6 @@ async function calculateOptimal(cL, cW, cH, maxWeight, items) {
         computedBoxes = data.boxes;
         computedPallets = data.pallets || [];
 
-        // Thống kê Thùng hàng
         let counts = {};
         BOX_TYPES.forEach(b => counts[b.id] = 0);
         computedBoxes.forEach(box => counts[box.id]++);
@@ -300,13 +352,11 @@ async function calculateOptimal(cL, cW, cH, maxWeight, items) {
             }
         });
 
-        // Thống kê Pallet
         const palletCount = computedPallets.length;
         const palletWeight = palletCount * pWg;
         document.getElementById('kpi-pallet').innerText = `${palletCount} tấm`;
         document.getElementById('kpi-pallet-weight').innerText = `${palletWeight.toLocaleString()} kg`;
 
-        // Thống kê Tải trọng và Thể tích tổng hợp
         const containerVol = cL * cW * cH;
         const totalUsedVol = data.total_vol_boxes + data.total_vol_pallets;
         const freeVol = containerVol - totalUsedVol;
